@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Martes — design canvas</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="tabbar">
+  <div class="tab-logo">martes<span>.</span></div>
+
+  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path d="M2 4h14M2 9h14M2 14h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <button class="tab-btn active" data-tab="tools">
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path d="M2 11 Q4 3 7 7 Q10 11 12 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    </svg>
+    Tools
+  </button>
+
+  <button class="tab-btn" data-tab="textures">
+    <svg width="13" height="13" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <rect x="1" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+      <rect x="8" y="1" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+      <rect x="1" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+      <rect x="8" y="8" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/>
+    </svg>
+    Textures
+  </button>
+</div>
+
+<div class="app">
+
+  <!-- ── TOOLS — all generators in one canvas ─────────────────── -->
+  <div class="tab-panel active" id="tab-tools">
+    <div class="studio-layout">
+
+      <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+      <aside class="studio-sidebar" id="sidebarEl">
+        <div class="sidebar-head">Generators</div>
+        <div class="tool-list" id="toolList"></div>
+      </aside>
+
+      <main class="studio-canvas" id="canvasArea">
+        <svg id="svgCanvas" xmlns="http://www.w3.org/2000/svg"
+             role="img" aria-label="Generated artwork canvas"></svg>
+      </main>
+
+      <aside class="studio-panel">
+        <div class="panel-scroll">
+
+          <div class="p-section">
+            <div class="p-sec-head" data-sec="tool">
+              Tool
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="p-sec-body" id="sec-tool">
+              <div style="padding:0.5rem 0;font-size:0.72rem;color:var(--text-muted)">Choose a generator →</div>
+            </div>
+          </div>
+
+          <div class="p-section">
+            <div class="p-sec-head" data-sec="canvas">
+              Canvas
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="p-sec-body" id="sec-canvas">
+              <select class="select-input" id="ratioSelect">
+                <option value="2:3">2:3 — 600×900</option>
+                <option value="1:1">1:1 — 900×900</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="dynamicSections"></div>
+
+        </div>
+
+        <div class="panel-actions">
+          <div class="action-head">Actions</div>
+          <div class="action-btns">
+            <button class="act-btn randomize" id="btnRandomize" disabled>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M8 1h3v3M4 8l7-7M1 11l3-3M8 11h3V8M4 4l-3 3 3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Randomize
+            </button>
+            <button class="act-btn save" id="btnSave" disabled>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M2 9l4 2 4-2M6 2v8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              SVG
+            </button>
+            <button class="act-btn copy" id="btnCopy" disabled>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <rect x="4" y="4" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                <path d="M4 8H2a1 1 0 01-1-1V2a1 1 0 011-1h5a1 1 0 011 1v2" stroke="currentColor" stroke-width="1.3"/>
+              </svg>
+              Copy
+            </button>
+            <button class="act-btn png" id="btnPng" disabled>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <rect x="1" y="2" width="10" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                <circle cx="4" cy="5" r="1.2" fill="currentColor"/>
+                <path d="M1 9l3-3 2 1 3-4 2 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+              PNG
+            </button>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- ── TEXTURES (canvas 2×3) ──────────────────────────────── -->
+  <div class="tab-panel" id="tab-textures">
+    <div class="tex-toolbar">
+      <span class="tex-toolbar-title">Textures</span>
+      <input class="tex-search" id="texSearch" type="text" placeholder="Filter by number…" />
+      <button class="tex-sort-btn active" id="texSortNum" title="Numeric order"># 1–360</button>
+      <button class="tex-sort-btn" id="texSortRandom" title="Shuffle order">⇄ Shuffle</button>
+      <div class="tex-spacer"></div>
+      <span class="tex-count" id="texCount">360 textures</span>
+    </div>
+    <div class="tex-body">
+      <div class="tex-grid" id="texGrid"></div>
+      <div class="tex-pagination" id="texPagination"></div>
+    </div>
+  </div>
+
+</div>
+
+<!--
+  Script order — synchronous (no defer) so dependencies are explicit:
+
+    core        — utilities (svgEl, uid, rnd…), canvas state, tab switching
+    registry    — declares empty TOOLS array + UI functions + martesInit()
+    _helpers    — shared tile helpers (tileGrid, hypocycloidPath, …)
+    tools/*.js  — one file per generator. Each registers itself via TOOLS.push()
+    textures    — paginated 2×3 gallery, lazy-init
+    <script>    — one call to martesInit() after everything is loaded
+-->
+<script src="assets/js/core.js"></script>
+<script src="assets/js/registry.js"></script>
+<script src="assets/js/tools/_helpers.js"></script>
+
+<!-- Weave -->
+<script src="assets/js/tools/slash.js"></script>
+<script src="assets/js/tools/quartz.js"></script>
+<script src="assets/js/tools/dust.js"></script>
+<script src="assets/js/tools/tessera.js"></script>
+<script src="assets/js/tools/orbit.js"></script>
+<script src="assets/js/tools/scale.js"></script>
+<script src="assets/js/tools/prism.js"></script>
+
+<!-- Shared Voronoi + SVG parser (used by burst, leaf, prism) -->
+<script src="assets/js/tools/_voronoi.js"></script>
+
+<!-- Form -->
+<script src="assets/js/tools/burst.js"></script>
+<script src="assets/js/tools/halo.js"></script>
+<script src="assets/js/tools/vortex.js"></script>
+<script src="assets/js/tools/coil.js"></script>
+<script src="assets/js/tools/leaf.js"></script>
+<script src="assets/js/tools/splat.js"></script>
+<script src="assets/js/tools/mirror.js"></script>
+<script src="assets/js/tools/bloom.js"></script>
+
+<!-- Flow -->
+<script src="assets/js/tools/surf.js"></script>
+<script src="assets/js/tools/wave.js"></script>
+<script src="assets/js/tools/ripple.js"></script>
+<script src="assets/js/tools/drift.js"></script>
+<script src="assets/js/tools/whorl.js"></script>
+<script src="assets/js/tools/shine.js"></script>
+
+<!-- Field / Glow -->
+<script src="assets/js/tools/haze.js"></script>
+<script src="assets/js/tools/flux.js"></script>
+
+<!-- Tile presets -->
+<script src="assets/js/tools/tile/radius.js"></script>
+<script src="assets/js/tools/tile/mixtape.js"></script>
+<script src="assets/js/tools/tile/odessa.js"></script>
+<script src="assets/js/tools/tile/veil.js"></script>
+<script src="assets/js/tools/tile/blossom.js"></script>
+<script src="assets/js/tools/tile/disque.js"></script>
+<script src="assets/js/tools/tile/bloks.js"></script>
+<script src="assets/js/tools/tile/terrain.js"></script>
+<script src="assets/js/tools/tile/trigram.js"></script>
+<script src="assets/js/tools/tile/ring.js"></script>
+<script src="assets/js/tools/tile/symmetry.js"></script>
+
+<script src="assets/js/textures.js"></script>
+<script>window.martesInit();</script>
+</body>
+</html>
