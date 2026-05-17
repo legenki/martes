@@ -6,7 +6,7 @@
   const BASE_THUMB = 'textures/thumb/thumb-';
   const BASE_FULL  = 'textures/full/';
   const TOTAL      = 360;
-  const PER_PAGE   = 6;   // canvas 2×3 grid
+  const PER_PAGE   = 48;  // auto-fit grid (~270px cards)
 
   function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -50,7 +50,8 @@
       item.className = 'tex-item';
 
       const img = document.createElement('img');
-      img.loading = idx < 6 ? 'eager' : 'lazy';
+      // First viewport (~8 cards) loads eagerly; the rest lazy as the user scrolls.
+      img.loading = idx < 8 ? 'eager' : 'lazy';
       img.decoding = 'async';
       img.alt = `Texture #${p}`;
       img.src = `${BASE_THUMB}${p}.jpg`;
