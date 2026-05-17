@@ -859,6 +859,24 @@ function getSVGString() {
 // ═══════════════════════════════════════════════════════════════
 // KEYBOARD SHORTCUTS
 // ═══════════════════════════════════════════════════════════════
+// Coalesce rapid arrow-key tool switching: one rAF per frame, so
+// holding ↑/↓ doesn't pile up 60+ buildPanel/renderTool calls per second.
+let _navPendingDelta = 0;
+let _navScheduled = false;
+function navigateTool(delta) {
+  _navPendingDelta += delta;
+  if (_navScheduled) return;
+  _navScheduled = true;
+  requestAnimationFrame(() => {
+    _navScheduled = false;
+    if (!currentTool) { _navPendingDelta = 0; return; }
+    const idx  = TOOLS.indexOf(currentTool);
+    const next = Math.max(0, Math.min(TOOLS.length - 1, idx + _navPendingDelta));
+    _navPendingDelta = 0;
+    if (next !== idx) selectTool(TOOLS[next]);
+  });
+}
+
 document.addEventListener('keydown', (e) => {
   // Skip when typing in inputs/textareas
   const tag = (e.target.tagName || '').toLowerCase();
@@ -879,20 +897,8 @@ document.addEventListener('keydown', (e) => {
     case 's': e.preventDefault(); doSaveSVG(); break;
     case 'p': e.preventDefault(); doSavePNG(); break;
     case 'c': e.preventDefault(); doCopy(); break;
-    case 'arrowdown': {
-      e.preventDefault();
-      if (!currentTool) break;
-      const idx = TOOLS.indexOf(currentTool);
-      if (idx < TOOLS.length - 1) selectTool(TOOLS[idx + 1]);
-      break;
-    }
-    case 'arrowup': {
-      e.preventDefault();
-      if (!currentTool) break;
-      const idx = TOOLS.indexOf(currentTool);
-      if (idx > 0) selectTool(TOOLS[idx - 1]);
-      break;
-    }
+    case 'arrowdown': e.preventDefault(); navigateTool(+1); break;
+    case 'arrowup':   e.preventDefault(); navigateTool(-1); break;
   }
 });
 

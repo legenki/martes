@@ -175,7 +175,8 @@ function applyPaletteGlobal(palette, paletteIndex = -1) {
   // Build full list once.
   function paletteRowHtml(palette, idx) {
     const swatches = palette.map(c => `<i style="background:${c}"></i>`).join('');
-    return `<div class="palette-row" role="option" data-idx="${idx}">
+    const selected = idx === currentPaletteIndex ? 'true' : 'false';
+    return `<div class="palette-row" role="option" tabindex="-1" aria-selected="${selected}" data-idx="${idx}">
       <span class="palette-row-swatches">${swatches}</span>
       <span class="palette-row-num">${String(idx + 1).padStart(3, '0')}</span>
     </div>`;
@@ -205,6 +206,28 @@ function applyPaletteGlobal(palette, paletteIndex = -1) {
     });
   }
   renderList('');
+
+  // Keyboard navigation within the dropdown — pure listbox pattern.
+  // Focus stays on the search input; arrow keys highlight a row via .focused.
+  function focusedRow() { return list.querySelector('.palette-row.focused'); }
+  function setFocused(row) {
+    list.querySelectorAll('.palette-row.focused').forEach(r => r.classList.remove('focused'));
+    if (row) {
+      row.classList.add('focused');
+      row.scrollIntoView({ block: 'nearest' });
+      search.setAttribute('aria-activedescendant', row.id || (row.id = 'palette-row-' + row.dataset.idx));
+    } else {
+      search.removeAttribute('aria-activedescendant');
+    }
+  }
+  function moveFocus(delta) {
+    const rows = [...list.querySelectorAll('.palette-row')];
+    if (!rows.length) return;
+    const cur = focusedRow();
+    let idx = cur ? rows.indexOf(cur) : -1;
+    idx = Math.max(0, Math.min(rows.length - 1, idx + delta));
+    setFocused(rows[idx]);
+  }
 
   function choose(idx) {
     const palette = NICE_PALETTES[idx];
@@ -241,7 +264,21 @@ function applyPaletteGlobal(palette, paletteIndex = -1) {
 
   button.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
   search.addEventListener('input', () => renderList(search.value));
-  search.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  search.addEventListener('keydown', (e) => {
+    const rows = list.querySelectorAll('.palette-row');
+    switch (e.key) {
+      case 'Escape':    close(); break;
+      case 'ArrowDown': e.preventDefault(); moveFocus(1); break;
+      case 'ArrowUp':   e.preventDefault(); moveFocus(-1); break;
+      case 'Home':      e.preventDefault(); if (rows[0])           setFocused(rows[0]); break;
+      case 'End':       e.preventDefault(); if (rows.length)       setFocused(rows[rows.length - 1]); break;
+      case 'Enter':     e.preventDefault(); {
+        const row = focusedRow() || rows[0];
+        if (row) choose(parseInt(row.dataset.idx, 10));
+        break;
+      }
+    }
+  });
   // Outside-click closes — but skip the work if dropdown isn't even open.
   document.addEventListener('click', (e) => {
     if (!root.classList.contains('open')) return;

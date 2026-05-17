@@ -3,10 +3,11 @@
 // TEXTURE TAB
 // ═══════════════════════════════════════════════════════════════
 (function initTextures() {
-  const BASE_THUMB = 'textures/thumb/thumb-';
-  const BASE_FULL  = 'textures/full/';
-  const TOTAL      = 360;
-  const PER_PAGE   = 48;  // auto-fit grid (~270px cards)
+  const BASE_THUMB        = 'textures/thumb/thumb-';
+  const BASE_FULL         = 'textures/full/';
+  const TOTAL             = 360;
+  const PER_PAGE          = 48;  // auto-fit grid (~270px cards)
+  const EAGER_LOAD_COUNT  = 8;   // first row(s) eager, rest lazy on scroll
 
   function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -51,7 +52,7 @@
 
       const img = document.createElement('img');
       // First viewport (~8 cards) loads eagerly; the rest lazy as the user scrolls.
-      img.loading = idx < 8 ? 'eager' : 'lazy';
+      img.loading = idx < EAGER_LOAD_COUNT ? 'eager' : 'lazy';
       img.decoding = 'async';
       img.alt = `Texture #${p}`;
       img.src = `${BASE_THUMB}${p}.jpg`;

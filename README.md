@@ -181,7 +181,7 @@ The server intentionally has no proxy, no remote fetches, no third-party endpoin
 | `Ctrl+Z` | Undo |
 | `Ctrl+Y` or `Ctrl+Shift+Z` | Redo |
 
-Shortcuts are disabled when focus is inside an input, textarea, or select.
+Single-key shortcuts (`R`/`S`/`P`/`C`/`↑`/`↓`) work without modifiers and are disabled whenever focus is inside an `<input>`, `<textarea>`, or `<select>`. Inside the palette dropdown, `↑`/`↓` walk the filtered list, `Home`/`End` jump to the first/last match, `Enter` selects, `Escape` closes.
 
 ---
 

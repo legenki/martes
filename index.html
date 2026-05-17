@@ -4,9 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Martes — design canvas</title>
+  <meta name="description" content="A local design canvas with 34 SVG generators and a 360-texture browser.">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- Inline SVG favicon (no extra HTTP request) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%2318181b%22%2F%3E%3Cpath%20d%3D%22M9%2022%20L9%2010%20L16%2017%20L23%2010%20L23%2022%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E">
+
+  <!-- Open Graph / Twitter card -->
+  <meta property="og:title" content="Martes — design canvas">
+  <meta property="og:description" content="34 SVG generators and a 360-texture browser. Vanilla JS, no build step.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://legenki.github.io/martes/">
+  <meta name="twitter:card" content="summary">
+
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+
+<noscript>
+  <div style="padding:2rem;font:14px/1.5 system-ui;text-align:center">
+    <h1 style="font-size:1.25rem;margin-bottom:0.5rem">JavaScript required</h1>
+    <p>Martes is a client-side design canvas. Please enable JavaScript to use it.</p>
+  </div>
+</noscript>
 
 <div class="tabbar">
   <div class="tab-logo">martes<span>.</span></div>
@@ -63,7 +83,7 @@
               </svg>
             </div>
             <div class="p-sec-body" id="sec-tool">
-              <div style="padding:0.5rem 0;font-size:0.72rem;color:var(--text-muted)">Choose a generator →</div>
+              <div class="sec-tool-hint">Choose a generator →</div>
             </div>
           </div>
 
@@ -100,9 +120,13 @@
                     <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                   </svg>
                 </button>
-                <div class="palette-dropdown-panel" id="paletteDropdownPanel" role="listbox" hidden>
-                  <input type="text" class="palette-dropdown-search" id="paletteSearch" placeholder="Filter by hex or number…" />
-                  <div class="palette-dropdown-list" id="paletteList"></div>
+                <div class="palette-dropdown-panel" id="paletteDropdownPanel" hidden>
+                  <input type="text" class="palette-dropdown-search" id="paletteSearch"
+                         placeholder="Filter by hex or number…"
+                         aria-label="Filter palettes by colour hex or number"
+                         aria-autocomplete="list"
+                         aria-controls="paletteList" />
+                  <div class="palette-dropdown-list" id="paletteList" role="listbox" aria-label="Colour palettes"></div>
                 </div>
               </div>
             </div>

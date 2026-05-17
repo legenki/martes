@@ -10,6 +10,24 @@
   "engines": {
     "node": ">=16"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/legenki/martes.git"
+  },
+  "homepage": "https://legenki.github.io/martes/",
+  "bugs": {
+    "url": "https://github.com/legenki/martes/issues"
+  },
+  "keywords": [
+    "svg",
+    "generative-art",
+    "design",
+    "canvas",
+    "vanilla-js",
+    "no-build",
+    "tile-patterns",
+    "textures"
+  ],
   "license": "MIT",
   "private": true
 }
