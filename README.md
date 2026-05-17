@@ -6,9 +6,12 @@ A local design canvas that bundles two views into one tabbed interface:
   - 7 Weave generators (Slash, Quartz, Dust, Tessera, Orbit, Scale, Prism)
   - 8 Form generators (Burst, Halo, Vortex, Coil, Leaf, Splat, Mirror, Bloom)
   - 6 Flow generators (Surf, Wave, Ripple, Drift, Whorl, Shine)
-  - 2 Field generators (Haze, Flux)
+  - 1 Field generator (Haze)
+  - 1 Glow generator (Flux)
   - 11 Tile presets (Radius, Mixtape, Odessa, Veil, Blossom, Disque, Bloks, Terrain, Trigram, Ring, Symmetry) — pure SVG grid engine, no dependency.
-- **Textures** — browser/downloader for a library of 360 textures, paginated as a **2 × 3 canvas grid** (6 per page).
+- **Textures** — browser/downloader for a library of 360 textures, paginated grid (48 per page, auto-fit columns at 270 px minimum).
+
+A shared **Palette** dropdown in the right-hand panel applies one of 100 hand-picked colour palettes (from [nice-color-palettes](https://github.com/Experience-Monks/nice-color-palettes)) to every generator at once — switching from Slash to Halo keeps the same colours.
 
 Everything is plain HTML, CSS and ES2017 JavaScript served by a tiny Node.js process. No build step, no framework.
 
@@ -57,7 +60,9 @@ martes/
 │       ├── registry.js         # TOOLS array, sidebar + panel builder,
 │       │                       #   controls, undo/redo, keyboard shortcuts,
 │       │                       #   RAF throttle, actions (save/copy/PNG)
-│       ├── textures.js         # paginated 2×3 gallery, filter, shuffle
+│       ├── palettes.js         # 100 nice-color-palettes + dropdown UI,
+│       │                       #   applyPaletteGlobal() (paints every tool)
+│       ├── textures.js         # paginated auto-fit gallery, filter, shuffle
 │       └── tools/
 │           ├── _helpers.js     # shared tile engine (tileGrid, clipPaths,
 │           │                   #   filters, registerTilePreset)
@@ -143,12 +148,12 @@ TOOLS.push({
 The 11 presets are pure SVG generators. The file `_helpers.js` ships a grid engine — `tileGrid(parent, W, H, gridStr, bg, paint)` — that walks an M × N grid and calls `paint()` for each cell. Each preset calls `registerTilePreset()` to auto-build controls from palette + extras.
 
 ### Textures tab
-Six textures per page, 2 × 3 grid (single column on mobile). Layout in `assets/css/style.css`:
+48 textures per page on an auto-fit grid — columns are 270 px minimum, so 2 cols on a phone, 3-4 on a laptop, 5-6 on wide displays. Layout in `assets/css/style.css`:
 
 ```css
 .tex-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
   gap: 1rem;
 }
 ```
@@ -203,7 +208,7 @@ All controls read from these tokens. To rebrand, edit `:root` and the rest follo
 
 ## Textures notes
 
-`textures/full/` is large (~944 MB) because it contains 360 full-resolution JPGs. If you fork this repo:
+`textures/full/` is currently ~280 MB (compressed JPGs, avg ~780 KB each). If you fork this repo:
 
 - Recompress the JPGs (`cjpeg -quality 80` or similar) before committing.
 - Or move `textures/full/` to a release asset and load it on first run.

@@ -31,39 +31,85 @@ const UNDO_LIMIT = 20;
 const _undoStack = [];
 let   _redoStack = [];
 
+// A snapshot is one of two kinds:
+//   { kind: 'tool', slug, data }       — single-tool state (range/colour/etc)
+//   { kind: 'all',  toolState, palette, paletteIndex }
+//                                       — global state (palette change)
+function _snapshotTool() {
+  if (!currentTool) return null;
+  return { kind: 'tool', slug: currentTool.slug,
+           data: JSON.stringify(toolState[currentTool.slug] || {}) };
+}
+function _snapshotAll() {
+  return {
+    kind: 'all',
+    toolState: JSON.stringify(toolState),
+    palette: currentPalette ? [...currentPalette] : null,
+    paletteIndex: currentPaletteIndex
+  };
+}
+
 function pushUndo() {
   if (!currentTool) return;
-  const snap = JSON.stringify(toolState[currentTool.slug] || {});
-  // Avoid duplicate consecutive pushes
-  if (_undoStack.length > 0 && _undoStack[_undoStack.length - 1] === snap) return;
+  const snap = _snapshotTool();
+  if (!snap) return;
+  // De-dupe consecutive identical tool-only pushes.
+  const top = _undoStack[_undoStack.length - 1];
+  if (top && top.kind === 'tool' && top.slug === snap.slug && top.data === snap.data) return;
   _undoStack.push(snap);
   if (_undoStack.length > UNDO_LIMIT) _undoStack.shift();
   _redoStack = [];
 }
 
+// Used by palette-change — saves global state so undo restores colours
+// across every tool (not just the active one).
+function pushUndoGlobal() {
+  _undoStack.push(_snapshotAll());
+  if (_undoStack.length > UNDO_LIMIT) _undoStack.shift();
+  _redoStack = [];
+}
+
 function applyStateSnap(snap) {
-  toolState[currentTool.slug] = JSON.parse(snap);
-  // Restore canvas ratio (if saved with the snapshot).
-  const r = toolState[currentTool.slug]._ratio;
-  if (r && RATIOS[r]) {
-    [canvasW, canvasH] = RATIOS[r];
-    const sel = document.getElementById('ratioSelect');
-    if (sel) sel.value = r;
-    resizeCanvas();
+  if (snap.kind === 'all') {
+    // Restore every tool's state at once.
+    const restored = JSON.parse(snap.toolState);
+    Object.keys(toolState).forEach(k => delete toolState[k]);
+    Object.assign(toolState, restored);
+    if (typeof currentPalette !== 'undefined') {
+      currentPalette = snap.palette;
+      currentPaletteIndex = snap.paletteIndex;
+      // Update the palette dropdown button (if present).
+      if (window._refreshPaletteButton) window._refreshPaletteButton();
+    }
+  } else if (snap.kind === 'tool') {
+    toolState[snap.slug] = JSON.parse(snap.data);
   }
-  buildPanel(currentTool);
-  renderTool();
+  // Restore canvas ratio (if saved with the snapshot).
+  if (currentTool) {
+    const r = (toolState[currentTool.slug] || {})._ratio;
+    if (r && RATIOS[r]) {
+      [canvasW, canvasH] = RATIOS[r];
+      const sel = document.getElementById('ratioSelect');
+      if (sel) sel.value = r;
+      resizeCanvas();
+    }
+    buildPanel(currentTool);
+    renderTool();
+  }
 }
 
 function undo() {
   if (!currentTool || _undoStack.length === 0) return;
-  _redoStack.push(JSON.stringify(toolState[currentTool.slug] || {}));
+  // Mirror the kind of the snap we're about to apply.
+  const top = _undoStack[_undoStack.length - 1];
+  _redoStack.push(top.kind === 'all' ? _snapshotAll() : _snapshotTool());
   applyStateSnap(_undoStack.pop());
 }
 
 function redo() {
   if (!currentTool || _redoStack.length === 0) return;
-  _undoStack.push(JSON.stringify(toolState[currentTool.slug] || {}));
+  const top = _redoStack[_redoStack.length - 1];
+  _undoStack.push(top.kind === 'all' ? _snapshotAll() : _snapshotTool());
   applyStateSnap(_redoStack.pop());
 }
 
@@ -491,7 +537,10 @@ function bindBbCustomList(s, bbCtrl) {
 }
 
 function bindPanelEvents(tool, s) {
-  document.querySelectorAll('[data-ctrl]').forEach(el => {
+  // Scope to the panel — otherwise any future `data-ctrl` element
+  // outside #dynamicSections (e.g. in another tab) would also bind.
+  const scope = document.getElementById('dynamicSections') || document;
+  scope.querySelectorAll('[data-ctrl]').forEach(el => {
     const id = el.dataset.ctrl;
     if (el.type === 'color') {
       el.addEventListener('input', () => {
@@ -628,8 +677,8 @@ function bindPanelEvents(tool, s) {
     bindMmCustomList(s, mmCtrl);
   }
 
-  // SVG shape picker
-  document.querySelectorAll('[data-shapepicker]').forEach(picker => {
+  // SVG shape picker — same scope as data-ctrl above.
+  scope.querySelectorAll('[data-shapepicker]').forEach(picker => {
     const ctrlId = picker.dataset.shapepicker;
     picker.querySelectorAll('.shape-pick-btn').forEach(btn => {
       btn.addEventListener('click', () => {

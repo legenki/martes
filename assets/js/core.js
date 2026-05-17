@@ -171,10 +171,15 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (e.key === 'Escape' && sidebar.classList.contains('open')) closeSidebar();
   });
 
-  // Close sidebar when a tool is selected (on mobile)
-  document.getElementById('toolList').addEventListener('click', (e) => {
-    if (e.target.closest('.tool-btn') && window.innerWidth <= 1024) {
-      closeSidebar();
-    }
-  });
+  // Close sidebar when a tool is selected (on mobile).
+  // Guard against re-ordered <script> tags that might run this IIFE
+  // before #toolList is in the DOM.
+  const toolList = document.getElementById('toolList');
+  if (toolList) {
+    toolList.addEventListener('click', (e) => {
+      if (e.target.closest('.tool-btn') && window.innerWidth <= 1024) {
+        closeSidebar();
+      }
+    });
+  }
 })();

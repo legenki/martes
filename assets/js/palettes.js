@@ -209,7 +209,10 @@ function applyPaletteGlobal(palette, paletteIndex = -1) {
   function choose(idx) {
     const palette = NICE_PALETTES[idx];
     if (!palette) return;
-    if (typeof pushUndo === 'function') pushUndo();
+    // pushUndoGlobal snapshots ALL tools' state + the palette itself, so
+    // a later Ctrl+Z restores colours across every tool, not just the
+    // active one (palette is a global change).
+    if (typeof pushUndoGlobal === 'function') pushUndoGlobal();
     applyPaletteGlobal(palette, idx);
     paintButton(palette, `Palette ${String(idx + 1).padStart(3, '0')}`);
     list.querySelectorAll('.palette-row').forEach(r => {
@@ -218,6 +221,20 @@ function applyPaletteGlobal(palette, paletteIndex = -1) {
     close();
   }
 
+  // Expose so registry.js applyStateSnap() can refresh the button label
+  // after an undo/redo that restores a different palette.
+  window._refreshPaletteButton = function() {
+    if (typeof currentPaletteIndex !== 'undefined' && currentPaletteIndex >= 0 && NICE_PALETTES[currentPaletteIndex]) {
+      paintButton(NICE_PALETTES[currentPaletteIndex],
+                  `Palette ${String(currentPaletteIndex + 1).padStart(3, '0')}`);
+    } else {
+      paintButton(null, 'Default colours');
+    }
+    list.querySelectorAll('.palette-row').forEach(r => {
+      r.classList.toggle('active', parseInt(r.dataset.idx, 10) === currentPaletteIndex);
+    });
+  };
+
   function open()  { root.classList.add('open');    button.setAttribute('aria-expanded', 'true');  panel.hidden = false; search.focus(); }
   function close() { root.classList.remove('open'); button.setAttribute('aria-expanded', 'false'); panel.hidden = true;  }
   function toggle() { root.classList.contains('open') ? close() : open(); }
@@ -225,7 +242,9 @@ function applyPaletteGlobal(palette, paletteIndex = -1) {
   button.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
   search.addEventListener('input', () => renderList(search.value));
   search.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  // Outside-click closes — but skip the work if dropdown isn't even open.
   document.addEventListener('click', (e) => {
+    if (!root.classList.contains('open')) return;
     if (!root.contains(e.target)) close();
   });
 })();
