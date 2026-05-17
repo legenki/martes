@@ -110,6 +110,11 @@ function selectTool(tool) {
   document.getElementById('btnCopy').disabled = false;
   document.getElementById('btnPng').disabled = false;
   svg.setAttribute('aria-label', `${tool.name} — ${tool.desc || 'generated artwork'}`);
+  // If a palette was picked, apply it to this tool's colour slots before
+  // building the panel so the swatches reflect it immediately.
+  if (typeof currentPalette !== 'undefined' && currentPalette) {
+    applyPaletteToTool(tool, currentPalette);
+  }
   buildPanel(tool);
   renderTool();
 }
@@ -843,7 +848,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// INIT — exposed as a global; hub.html calls it after every tool
+// INIT — exposed as a global; index.html calls it after every tool
 // file has had a chance to push into TOOLS.
 // ═══════════════════════════════════════════════════════════════
 window.martesInit = function() {

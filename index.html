@@ -82,6 +82,32 @@
             </div>
           </div>
 
+          <div class="p-section">
+            <div class="p-sec-head" data-sec="palette">
+              Palette
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+                <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="p-sec-body" id="sec-palette">
+              <div class="palette-dropdown" id="paletteDropdown">
+                <button class="palette-dropdown-btn" id="paletteDropdownBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="palette-dropdown-swatches" id="paletteDropdownSwatches" aria-hidden="true">
+                    <!-- 5 small swatch divs are filled by JS -->
+                  </span>
+                  <span class="palette-dropdown-label" id="paletteDropdownLabel">Default colours</span>
+                  <svg width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true">
+                    <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </button>
+                <div class="palette-dropdown-panel" id="paletteDropdownPanel" role="listbox" hidden>
+                  <input type="text" class="palette-dropdown-search" id="paletteSearch" placeholder="Filter by hex or number…" />
+                  <div class="palette-dropdown-list" id="paletteList"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div id="dynamicSections"></div>
 
         </div>
@@ -203,6 +229,7 @@
 <script src="assets/js/tools/tile/symmetry.js"></script>
 
 <script src="assets/js/textures.js"></script>
+<script src="assets/js/palettes.js"></script>
 <script>window.martesInit();</script>
 </body>
 </html>

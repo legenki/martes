@@ -479,6 +479,99 @@ input[type="range"]::-webkit-slider-thumb {
   display: block; text-transform: uppercase;
 }
 
+/* ── Palette dropdown ────────────────────────────────────────── */
+.palette-dropdown { position: relative; }
+.palette-dropdown-btn {
+  display: flex; align-items: center; gap: 0.55rem;
+  width: 100%;
+  padding: 0.45rem 0.6rem 0.45rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  font-family: inherit; font-size: 0.78rem; font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.12s;
+}
+.palette-dropdown-btn:hover { border-color: var(--border-strong); }
+.palette-dropdown.open > .palette-dropdown-btn { border-color: var(--accent); }
+.palette-dropdown-swatches {
+  display: inline-flex; flex-shrink: 0;
+  gap: 0;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--border-strong);
+}
+.palette-dropdown-swatches > i {
+  display: block;
+  width: 12px; height: 14px;
+}
+.palette-dropdown-label  { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.palette-dropdown-btn svg { flex-shrink: 0; opacity: 0.5; transition: transform 0.2s; }
+.palette-dropdown.open > .palette-dropdown-btn svg { transform: rotate(180deg); }
+
+.palette-dropdown-panel {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  z-index: 20;
+  background: var(--bg-main);
+  border: 1px solid var(--border-strong);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow);
+  padding: 0.5rem;
+  display: flex; flex-direction: column; gap: 0.4rem;
+  max-height: 360px;
+}
+.palette-dropdown-search {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  background: var(--bg-soft);
+  color: var(--text-primary);
+  font-family: inherit; font-size: 0.74rem;
+  padding: 0.4rem 0.55rem;
+  outline: none;
+  transition: border-color 0.12s;
+}
+.palette-dropdown-search:focus { border-color: var(--accent); }
+.palette-dropdown-list {
+  flex: 1; min-height: 0;
+  overflow-y: auto;
+  display: flex; flex-direction: column; gap: 0.25rem;
+  scrollbar-width: thin;
+}
+.palette-dropdown-list::-webkit-scrollbar { width: 5px; }
+.palette-dropdown-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 9999px; }
+
+.palette-row {
+  display: flex; align-items: center; gap: 0.45rem;
+  padding: 0.32rem 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 0.4rem;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit; font-size: 0.7rem;
+  color: var(--text-muted);
+  transition: background 0.12s, color 0.12s;
+}
+.palette-row:hover { background: var(--accent-soft); color: var(--text-primary); }
+.palette-row.active {
+  background: var(--accent-soft);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+.palette-row-swatches {
+  display: inline-flex;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--border-strong);
+}
+.palette-row-swatches > i {
+  display: block;
+  width: 18px; height: 22px;
+}
+.palette-row-num { flex: 1; text-align: right; color: var(--text-faint); font-feature-settings: 'tnum'; }
+.palette-empty { text-align: center; font-size: 0.7rem; color: var(--text-faint); padding: 0.8rem 0; }
+
 /* ── SVG Shape Picker (single) ───────────────────────────────── */
 .shape-picker { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.35rem; margin-bottom: 0.55rem; }
 .shape-pick-btn {

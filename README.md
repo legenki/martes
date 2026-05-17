@@ -16,7 +16,7 @@ Everything is plain HTML, CSS and ES2017 JavaScript served by a tiny Node.js pro
 
 ## Screenshot
 
-> Add a screenshot of `hub.html` to `docs/screenshot.png` once published.
+> Add a screenshot of `index.html` to `docs/screenshot.png` once published.
 
 ---
 
@@ -40,7 +40,7 @@ On macOS you can also double-click `start.command` from Finder — it picks Node
 
 ```
 martes/
-├── hub.html                    # entry point, two-tab shell
+├── index.html                    # entry point, two-tab shell
 ├── server.js                   # minimal static file server
 ├── start.command               # macOS double-click launcher
 ├── start.sh                    # POSIX launcher
@@ -103,7 +103,7 @@ The split keeps each concern in one file. Render functions are declared in `tool
 
 ## How it works
 
-### Two-tab shell (`hub.html`)
+### Two-tab shell (`index.html`)
 Top tabbar offers **Tools** and **Textures**. Each tab corresponds to a `.tab-panel`. The Tools tab is rendered eagerly; Textures is initialised lazily on first open (see `core.js` tab handler).
 
 ### Tools tab — unified canvas
@@ -234,7 +234,7 @@ Thumbnails alone (`textures/thumb/`, ~20 MB) are enough for the gallery; full fi
      ]
    });
    ```
-3. Add `<script src="assets/js/tools/mytool.js"></script>` to `hub.html`.
+3. Add `<script src="assets/js/tools/mytool.js"></script>` to `index.html`.
 
 ### Grid (tile) preset
 1. Write a `renderTileFoo(svg, W, H, s)` function in `tools/tile/foo.js`:
@@ -259,7 +259,7 @@ Thumbnails alone (`textures/thumb/`, ~20 MB) are enough for the gallery; full fi
      extras:['grid','frequency']
    });
    ```
-3. Add the `<script>` tag to `hub.html`.
+3. Add the `<script>` tag to `index.html`.
 
 ---
 

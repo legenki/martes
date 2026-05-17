@@ -21,6 +21,6 @@ else
   echo "  Install Node.js from https://nodejs.org for the default launcher."
   echo ""
   echo "✓ Starting Martes on http://localhost:$PORT"
-  sleep 0.5 && open "http://localhost:$PORT/hub.html" &
+  sleep 0.5 && open "http://localhost:$PORT/index.html" &
   python3 -m http.server $PORT 2>/dev/null || python -m SimpleHTTPServer $PORT
 fi

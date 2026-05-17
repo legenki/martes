@@ -99,13 +99,15 @@ function renderTool() {
 function getState() {
   if (!currentTool) return {};
   const slug = currentTool.slug;
-  if (!toolState[slug]) {
-    toolState[slug] = {};
-    (currentTool.controls || []).forEach(c => {
-      toolState[slug][c.id] = c.default;
-    });
-  }
-  return toolState[slug];
+  if (!toolState[slug]) toolState[slug] = {};
+  const s = toolState[slug];
+  // Fill in any missing defaults — palette pre-fill may have created
+  // the object with only colour slots set; non-colour controls (range,
+  // toggle, btngroup, …) still need their defaults.
+  (currentTool.controls || []).forEach(c => {
+    if (s[c.id] === undefined) s[c.id] = c.default;
+  });
+  return s;
 }
 
 // ═══════════════════════════════════════════════════════════════

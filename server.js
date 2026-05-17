@@ -1,7 +1,7 @@
 /**
  * Martes — minimal static file server.
  *
- *   /          → hub.html
+ *   /          → index.html
  *   /<path>    → file under project root, with path-traversal protection.
  */
 const http = require('http');
@@ -40,7 +40,7 @@ http.createServer((req, res) => {
     res.writeHead(400); res.end('Bad URL'); return;
   }
 
-  if (urlPath === '/') urlPath = '/hub.html';
+  if (urlPath === '/') urlPath = '/index.html';
 
   // Resolve fully and require the result to live under ROOT.
   const filePath = path.resolve(ROOT, '.' + urlPath);
