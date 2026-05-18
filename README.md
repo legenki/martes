@@ -19,7 +19,7 @@ Everything is plain HTML, CSS and ES2017 JavaScript served by a tiny Node.js pro
 
 ## Screenshot
 
-> Add a screenshot of `index.html` to `docs/screenshot.png` once published.
+![Screenshot](docs/screenshot.png)
 
 ---
 
