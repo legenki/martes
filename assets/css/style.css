@@ -28,6 +28,22 @@
   --font-mono:      ui-monospace, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
+[data-theme="light"] {
+  --bg-main:        #ffffff;
+  --bg-soft:        #fafafa;
+  --bg-canvas:      #f4f4f5;
+  --bg-panel:       rgba(255, 255, 255, 0.85);
+  --border:         rgba(0, 0, 0, 0.08);
+  --border-strong:  rgba(0, 0, 0, 0.14);
+  --text-primary:   #18181b;
+  --text-muted:     rgba(24, 24, 27, 0.55);
+  --text-faint:     rgba(24, 24, 27, 0.35);
+  --accent:         #18181b;
+  --accent-soft:    rgba(24, 24, 27, 0.06);
+  --shadow:         0 8px 32px rgba(0,0,0,0.1);
+}
+
+
 html, body {
   height: 100%;
   overflow: hidden;
@@ -294,9 +310,17 @@ html, body {
 
 /* RIGHT PANEL */
 .studio-panel {
-  background: var(--bg-main);
-  border-left: 1px solid var(--border);
+  position: absolute;
+  top: 1rem; bottom: 1rem; right: 1rem;
+  width: var(--panel-w);
+  background: var(--bg-panel);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   display: flex; flex-direction: column; overflow: hidden;
+  z-index: 10;
+  box-shadow: var(--shadow);
 }
 .panel-scroll {
   flex: 1; overflow-y: auto;
@@ -865,3 +889,24 @@ input[type="range"]::-webkit-slider-thumb:hover {
     scroll-behavior: auto !important;
   }
 }
+
+
+.theme-toggle {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 99px;
+  transition: all 0.2s;
+  margin-left: 0.25rem;
+}
+.theme-toggle:hover {
+  background: var(--accent-soft);
+  color: var(--text-primary);
+}
+[data-theme="light"] .icon-moon { display: none !important; }
+[data-theme="light"] .icon-sun { display: block !important; }
