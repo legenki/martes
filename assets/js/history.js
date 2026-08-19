@@ -1,5 +1,5 @@
-import { currentTool, toolState, getState, renderTool } from './core.js';
-import { applyPaletteGlobal, currentPaletteIndex } from './palettes.js';
+import { currentTool, toolState, getState, renderTool, RATIOS, setCanvasSize } from './core.js';
+import { applyPaletteGlobal, currentPaletteIndex, currentPalette, setCurrentPalette } from './palettes.js';
 import { buildPanel } from './registry.js';
 
 // ═══════════════════════════════════════════════════════════════
@@ -53,12 +53,9 @@ export function applyStateSnap(snap) {
     const restored = JSON.parse(snap.toolState);
     Object.keys(toolState).forEach(k => delete toolState[k]);
     Object.assign(toolState, restored);
-    if (typeof currentPalette !== 'undefined') {
-      currentPalette = snap.palette;
-      currentPaletteIndex = snap.paletteIndex;
-      // Update the palette dropdown button (if present).
-      if (window._refreshPaletteButton) window._refreshPaletteButton();
-    }
+    setCurrentPalette(snap.palette, snap.paletteIndex);
+    // Update the palette dropdown button (if present).
+    if (window._refreshPaletteButton) window._refreshPaletteButton();
   } else if (snap.kind === 'tool') {
     toolState[snap.slug] = JSON.parse(snap.data);
   }
@@ -66,10 +63,9 @@ export function applyStateSnap(snap) {
   if (currentTool) {
     const r = (toolState[currentTool.slug] || {})._ratio;
     if (r && RATIOS[r]) {
-      [canvasW, canvasH] = RATIOS[r];
+      setCanvasSize(...RATIOS[r]);
       const sel = document.getElementById('ratioSelect');
       if (sel) sel.value = r;
-      resizeCanvas();
     }
     buildPanel(currentTool);
     renderTool();

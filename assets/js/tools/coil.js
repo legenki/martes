@@ -72,8 +72,8 @@ export default {
   render: renderCoil,
   controls: [
     { type:'color',    id:'bgColor',     label:'Background',  default:'#0d0d1a' },
-    { type:'color',    id:'color1',      label:'Color top',   default:'hsl(206,75%,49%)' },
-    { type:'color',    id:'color2',      label:'Color bottom',default:'hsl(331,90%,56%)' },
+    { type:'color',    id:'color1',      label:'Color top',   default:'#1f89db' },
+    { type:'color',    id:'color2',      label:'Color bottom',default:'#f42a8b' },
     { type:'btngroup', id:'modOpacity',  label:'Opacity',     default:'fade', options:['Fade↓','Fade↑','Random','Solid'], values:['fade','fade-in','random',''] },
     { type:'btngroup', id:'lineCap',     label:'Line cap',    default:'round', options:['Round','Butt','Square'], values:['round','butt','square'] },
     { type:'btngroup', id:'direction',   label:'Fill dir',    default:1, options:['Out→In','In→Out'], values:[1,2] },

@@ -75,7 +75,7 @@ export default {
   render: renderShine,
   controls: [
     { type:'color',    id:'bgColor',       label:'Background',  default:'#0d0d1a' },
-    { type:'color',    id:'color',         label:'Line color',  default:'hsl(335,77%,50%)' },
+    { type:'color',    id:'color',         label:'Line color',  default:'#e21d6f' },
     { type:'btngroup', id:'modOpacity',    label:'Opacity',     default:'random', options:['Random','Solid'], values:['random',''] },
     { type:'btngroup', id:'lineCap',       label:'Line cap',    default:'round',  options:['Round','Square','Butt'], values:['round','square','butt'] },
     { type:'range',    id:'frequency',     label:'Lines',       default:88,   min:5,    max:333,  step:1 },

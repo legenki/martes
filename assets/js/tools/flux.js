@@ -109,8 +109,8 @@ export default {
   render: renderFlux,
   controls: [
     { type:'color',    id:'bgColor',   label:'Background',  default:'#000000' },
-    { type:'color',    id:'color1',    label:'Color 1',     default:'hsl(200,90%,50%)' },
-    { type:'color',    id:'color2',    label:'Color 2',     default:'hsl(320,80%,55%)' },
+    { type:'color',    id:'color1',    label:'Color 1',     default:'#0da6f2' },
+    { type:'color',    id:'color2',    label:'Color 2',     default:'#e830ab' },
     { type:'toggle',   id:'linear',    label:'Linear grad', default:true },
     { type:'range',    id:'angle',     label:'Angle',       default:150,  min:0,     max:360,  step:1 },
     { type:'btngroup', id:'blendMode', label:'Blend mode',  default:'color-dodge',

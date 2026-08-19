@@ -85,8 +85,8 @@ export default {
   desc: 'Quadtree triangle grid',
   render: renderQuartz,
   controls: [
-    { type:'color',  id:'color',       label:'Shape color',  default:'hsl(220,62%,45%)' },
-    { type:'color',  id:'bgColor',     label:'Background',   default:'hsl(220,43%,13%)' },
+    { type:'color',  id:'color',       label:'Shape color',  default:'#2c5bba' },
+    { type:'color',  id:'bgColor',     label:'Background',   default:'#131c2f' },
     { type:'toggle', id:'filled',      label:'Filled shapes',default:true },
     { type:'range',  id:'density',     label:'Points',       default:333, min:10,  max:800, step:10 },
     { type:'range',  id:'gap',         label:'Gap',          default:0,   min:0,   max:20,  step:0.5 },

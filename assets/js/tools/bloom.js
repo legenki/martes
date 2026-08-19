@@ -8,7 +8,8 @@
 import { rnd, rndInt, uid, svgEl } from '../core.js';
 
 function renderBloom(svg, W, H, s) {
-  const bgColor   = s.bgColor    || 'none';
+  const bgColor   = s.bgColor    || '#ffffff';
+  const bgOn      = s.bgTransparent ? false : true;
   const freq      = s.frequency  ?? 22;
   const fillType  = s.fillType   || 'gradient';
   const color1    = s.fills ? s.fills[0] : (s.color1 || 'hsl(37,99%,67%)');
@@ -18,12 +19,12 @@ function renderBloom(svg, W, H, s) {
   const sw        = s.strokeWidth ?? 2;
   const opacity   = s.opacity    ?? 1;
 
-  if (bgColor && bgColor !== 'none') {
+  if (bgOn && bgColor && bgColor !== 'none') {
     svg.appendChild(svgEl('rect', {x:0,y:0,width:W,height:H,fill:bgColor}));
   }
 
-  const uid    = 'uuu-' + Math.random().toString(36).slice(2,8);
-  const gradId = uid + '-g';
+  const localId = uid('uuu');
+  const gradId = localId + '-g';
   const defs   = svgEl('defs');
 
   if (fillType === 'gradient') {
@@ -92,12 +93,13 @@ export default {
   desc: 'Catmull-Rom concentric blobs',
   render: renderBloom,
   controls: [
-    { type:'color',    id:'bgColor',       label:'Background',  default:'none' },
-    { type:'color',    id:'color1',        label:'Color 1',     default:'hsl(37,99%,67%)' },
-    { type:'color',    id:'color2',        label:'Color 2',     default:'hsl(316,73%,52%)' },
+    { type:'color',    id:'bgColor',       label:'Background',  default:'#ffffff' },
+    { type:'toggle',   id:'bgTransparent', label:'Transparent bg', default:true },
+    { type:'color',    id:'color1',        label:'Color 1',     default:'#febe58' },
+    { type:'color',    id:'color2',        label:'Color 2',     default:'#de2bae' },
     { type:'btngroup', id:'fillType',      label:'Fill',        default:'gradient',
       options:['Gradient','Solid'], values:['gradient','solid'] },
-    { type:'color',    id:'fill',          label:'Solid color', default:'hsl(32,100%,51%)' },
+    { type:'color',    id:'fill',          label:'Solid color', default:'#ff8a05' },
     { type:'range',    id:'frequency',     label:'Rings',       default:22,  min:11,  max:77,   step:1 },
     { type:'range',    id:'scaleConstant', label:'Size',        default:25,  min:10,  max:150,  step:1 },
     { type:'range',    id:'strokeWidth',   label:'Stroke',      default:2,   min:1,   max:11,   step:0.5 },

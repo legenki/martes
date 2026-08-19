@@ -74,8 +74,8 @@ export default {
   render: renderWave,
   controls: [
     { type:'color',    id:'bgColor',       label:'Background', default:'#ffffff' },
-    { type:'color',    id:'color1',        label:'Color 1',    default:'hsl(206,75%,49%)' },
-    { type:'color',    id:'color2',        label:'Color 2',    default:'hsl(331,90%,56%)' },
+    { type:'color',    id:'color1',        label:'Color 1',    default:'#1f89db' },
+    { type:'color',    id:'color2',        label:'Color 2',    default:'#f42a8b' },
     { type:'btngroup', id:'modOpacity',    label:'Opacity',    default:'random', options:['Random','Fade↓','Fade↑','Solid'], values:['random','fade','fade-in',''] },
     { type:'btngroup', id:'lineCap',       label:'Line cap',   default:'round',  options:['Round','Butt','Square'], values:['round','butt','square'] },
     { type:'range',    id:'frequency',     label:'Lines',      default:26,  min:1,   max:60,  step:1 },

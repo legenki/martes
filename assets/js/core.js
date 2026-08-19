@@ -40,6 +40,48 @@ export function parseColor(color) {
   return [d[0], d[1], d[2]];
 }
 
+// ── The one colour normaliser ──────────────────────────────────
+// Every colour that reaches state, a swatch, or a palette goes through
+// here. `<input type="color">` accepts *only* `#rrggbb`; handed anything
+// else it silently shows #000000 while the canvas draws the real colour,
+// so the swatch and the artwork disagree. Normalising on the way in keeps
+// the two in sync no matter what a generator declares as its default.
+//
+// `fallback` is returned for values that are valid SVG paint but not a
+// displayable colour ('none', 'transparent') or that fail to parse.
+export function toHex(color, fallback = '#000000') {
+  if (color == null) return fallback;
+  const c = String(color).trim().toLowerCase();
+  if (c === '' || c === 'none' || c === 'transparent') return fallback;
+  if (/^#[0-9a-f]{6}$/.test(c)) return c;
+  if (/^#[0-9a-f]{3}$/.test(c)) return '#' + [...c.slice(1)].map(ch => ch + ch).join('');
+
+  // hsl()/hsla() parsed directly rather than via canvas — generators declare
+  // a lot of hsl defaults, and this keeps the conversion exact and testable
+  // instead of depending on a 2D context being available.
+  const hsl = /^hsla?\(\s*([-\d.]+)(?:deg)?\s*[, ]\s*([\d.]+)%\s*[, ]\s*([\d.]+)%/.exec(c);
+  if (hsl) {
+    const h = ((parseFloat(hsl[1]) % 360) + 360) % 360;
+    const sat = clamp(parseFloat(hsl[2]) / 100, 0, 1);
+    const li = clamp(parseFloat(hsl[3]) / 100, 0, 1);
+    const k = n => (n + h / 30) % 12;
+    const a = sat * Math.min(li, 1 - li);
+    const f = n => li - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return rgbToHex(f(0) * 255, f(8) * 255, f(4) * 255);
+  }
+
+  const rgb = /^rgba?\(\s*([\d.]+)\s*[, ]\s*([\d.]+)\s*[, ]\s*([\d.]+)/.exec(c);
+  if (rgb) return rgbToHex(+rgb[1], +rgb[2], +rgb[3]);
+
+  // Anything left (named colours, lab(), colour keywords) goes through the
+  // browser's own parser.
+  const [r, g, b] = parseColor(c);
+  // parseColor leaves the pixel untouched for input the browser rejects, so a
+  // black result is only trustworthy when the input really did name black.
+  if (r === 0 && g === 0 && b === 0 && !/^(black|#000000|#000)$/.test(c)) return fallback;
+  return rgbToHex(r, g, b);
+}
+
 export function lerpColor(c1, c2, t) {
   const a = parseColor(c1), b = parseColor(c2);
   return rgbToHex(lerp(a[0],b[0],t), lerp(a[1],b[1],t), lerp(a[2],b[2],t));
@@ -66,6 +108,13 @@ export const toolState = {};
 
 export const svg = document.getElementById('svgCanvas');
 export const canvasArea = document.getElementById('canvasArea');
+// Imported `let` bindings are read-only in the importing module, so canvas
+// size changes have to come back through here.
+export function setCanvasSize(w, h) {
+  canvasW = w; canvasH = h;
+  resizeCanvas();
+}
+
 export function resizeCanvas() {
   svg.setAttribute('width', canvasW);
   svg.setAttribute('height', canvasH);

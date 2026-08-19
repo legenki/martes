@@ -1,7 +1,11 @@
 import { BB_SHAPES } from './tools/burst.js';
 import { MM_SHAPES } from './tools/tessera.js';
-import { setCurrentTool, rndInt, pick, map, RATIOS, canvasW, canvasH, currentTool, toolState, svg, resizeCanvas, renderTool, getState } from './core.js';
+import { setCurrentTool, rndInt, pick, map, RATIOS, canvasW, canvasH, currentTool, toolState, svg, resizeCanvas, renderTool, getState, toHex, setCanvasSize } from './core.js';
 import { pushUndo } from './history.js';
+// Side-effect imports: these modules bind the action buttons and the
+// keyboard shortcuts on load. registry.js is the app's only entry point.
+import './actions.js';
+import './keyboard.js';
 import { currentPalette, currentPaletteIndex, applyPaletteToTool, applyPaletteGlobal } from './palettes.js';
 import splat from './tools/splat.js';
 import dust from './tools/dust.js';
@@ -46,7 +50,7 @@ import odessa from './tools/tile/odessa.js';
 // sidebar build, panel build, control widgets, action buttons,
 // random/save/copy, and the public window.martesInit() entry.
 // ═══════════════════════════════════════════════════════════════
-const TOOLS = [
+export const TOOLS = [
   splat,
   dust,
   prism,
@@ -136,14 +140,13 @@ function buildSidebar() {
 // ═══════════════════════════════════════════════════════════════
 // SELECT TOOL
 // ═══════════════════════════════════════════════════════════════
-function selectTool(tool) {
+export function selectTool(tool) {
   setCurrentTool(tool);
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.toggle('active', b.dataset.slug === tool.slug));
-  document.getElementById('btnRandomize').disabled = false;
-  document.getElementById('btnSave').disabled = false;
-  document.getElementById('btnExport').disabled = false;
-  document.getElementById('btnCopy').disabled = false;
-  document.getElementById('btnPng').disabled = false;
+  for (const id of ['btnRandomize','btnSave','btnExport','btnCopy','btnPng']) {
+    const b = document.getElementById(id);
+    if (b) b.disabled = false;
+  }
   svg.setAttribute('aria-label', `${tool.name} — ${tool.desc || 'generated artwork'}`);
   // If a palette was picked, apply it to this tool's colour slots before
   // building the panel so the swatches reflect it immediately.
@@ -158,7 +161,8 @@ function selectTool(tool) {
 // BUILD PANEL
 // ═══════════════════════════════════════════════════════════════
 export function buildPanel(tool) {
-  document.getElementById('sec-tool').innerHTML = `
+  const secTool = document.getElementById('sec-tool');
+  if (secTool) secTool.innerHTML = `
     <div class="tool-card">
       <div class="tool-card-name">
         <span class="tool-icon" aria-hidden="true">${tool.icon || tool.emoji || ''}</span>
@@ -181,8 +185,8 @@ export function buildPanel(tool) {
           <div class="color-row">
             ${colorCtrls.map(c => `
               <div class="color-item">
-                <div class="color-swatch" style="background:${s[c.id]}">
-                  <input type="color" value="${s[c.id]}" data-ctrl="${c.id}">
+                <div class="color-swatch" style="background:${toHex(s[c.id], c.default)}">
+                  <input type="color" value="${toHex(s[c.id], c.default)}" data-ctrl="${c.id}">
                 </div>
                 <span class="color-name">${c.label}</span>
               </div>`).join('')}
@@ -201,7 +205,8 @@ export function buildPanel(tool) {
       </div>`;
   }
 
-  document.getElementById('dynamicSections').innerHTML = html;
+  const dyn = document.getElementById('dynamicSections');
+  if (dyn) dyn.innerHTML = html;
   bindPanelEvents(tool, s);
   bindAccordion();
 }
@@ -719,25 +724,23 @@ function bindAccordion() {
 // ═══════════════════════════════════════════════════════════════
 // CANVAS RATIO
 // ═══════════════════════════════════════════════════════════════
-document.getElementById('ratioSelect').addEventListener('change', function() {
+document.getElementById('ratioSelect')?.addEventListener('change', function() {
   pushUndo();
-  [canvasW, canvasH] = RATIOS[this.value];
+  setCanvasSize(...RATIOS[this.value]);
   // Persist on the per-tool state so undo can restore it alongside the rest.
   if (currentTool) {
     const s = toolState[currentTool.slug] || (toolState[currentTool.slug] = {});
     s._ratio = this.value;
   }
-  resizeCanvas();
   renderTool();
 });
 
 
-function martesInit() { document.title="INIT START"; try {
+function martesInit() {
   buildSidebar();
   resizeCanvas();
-  selectTool(TOOLS[0]); document.title="TOOLS: " + TOOLS.length;
-} catch(e) { document.title = "ERR: " + e.message; } };
+  selectTool(TOOLS[0]);
+}
 
 // Initialize everything
 martesInit();
-window.DEBUG_TOOLS = TOOLS;

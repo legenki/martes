@@ -78,8 +78,8 @@ export default {
   render: renderWhorl,
   controls: [
     { type:'color',    id:'bgColor',     label:'Background', default:'#ffffff' },
-    { type:'color',    id:'color1',      label:'Color top',  default:'hsl(206,75%,49%)' },
-    { type:'color',    id:'color2',      label:'Color btm',  default:'hsl(331,90%,56%)' },
+    { type:'color',    id:'color1',      label:'Color top',  default:'#1f89db' },
+    { type:'color',    id:'color2',      label:'Color btm',  default:'#f42a8b' },
     { type:'btngroup', id:'modOpacity',  label:'Opacity',    default:'random', options:['Random','Fade↓','Fade↑','Solid'], values:['random','fade','fade-in',''] },
     { type:'range',    id:'lines',       label:'Lines',      default:14,   min:2,   max:30,   step:1 },
     { type:'range',    id:'spacing',     label:'Ring size',  default:68,   min:10,  max:200,  step:1 },

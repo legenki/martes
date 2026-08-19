@@ -1,6 +1,6 @@
 import { pushUndoGlobal, applyStateSnap } from './history.js';
-import { buildPanel } from './registry.js';
-import { uid, svgEl, hexToRgb, rgbToHex, parseColor, lerpColor, cubicBez, toolState, renderTool, getState, currentTool, pick } from './core.js';
+import { buildPanel, TOOLS } from './registry.js';
+import { uid, svgEl, hexToRgb, rgbToHex, parseColor, lerpColor, cubicBez, toolState, renderTool, getState, currentTool, pick, toHex } from './core.js';
 export const NICE_PALETTES = [
 ["#69d2e7","#a7dbd8","#e0e4cc","#f38630","#fa6900"],
 ["#fe4365","#fc9d9a","#f9cdad","#c8c8a9","#83af9b"],
@@ -117,33 +117,51 @@ export const NICE_PALETTES = [
 export let currentPalette = null;
 export let currentPaletteIndex = -1;
 
+// Same read-only-binding rule as the canvas size: history.js restores a
+// palette snapshot and needs a setter to write back into this module.
+export function setCurrentPalette(palette, index = -1) {
+  currentPalette = palette;
+  currentPaletteIndex = palette ? index : -1;
+}
+
 // Apply `palette` (array of up to 5 hex strings) to a tool's state by
 // overwriting the first N color-typed controls. Returns true if any
 // slot was changed.
 export function applyPaletteToTool(tool, palette) {
-  if (!tool || !palette) return false;
+  if (!tool || !palette || !palette.length) return false;
   const colorCtrls = tool.controls.filter(c => c.type === 'color');
   if (!toolState[tool.slug]) toolState[tool.slug] = {};
   const s = toolState[tool.slug];
   let changed = false;
-  const n = Math.min(colorCtrls.length, palette.length);
-  for (let i = 0; i < n; i++) {
-    if (s[colorCtrls[i].id] !== palette[i]) {
-      s[colorCtrls[i].id] = palette[i];
-      changed = true;
-    }
-  }
+  // Cycle the palette so EVERY colour slot is filled. Tools declare between 1
+  // and 6 colour slots while palettes hold 5; mapping one-to-one used to leave
+  // a 6-slot tool's last colour stuck on its old value, so a "applied" palette
+  // still showed a foreign colour.
+  colorCtrls.forEach((ctrl, i) => {
+    const next = toHex(palette[i % palette.length]);
+    if (s[ctrl.id] !== next) { s[ctrl.id] = next; changed = true; }
+  });
   return changed;
 }
 
-// Apply a palette to EVERY registered tool's state (so a later switch
-// already has palette colours pre-loaded), and also refresh the panel
-// for the currently-selected tool so swatches update visually.
+// Apply a palette to EVERY registered tool's state (so a later switch already
+// has palette colours pre-loaded), and refresh the current panel + canvas.
+//
+// Accepts either a palette array or an index into NICE_PALETTES — doImportJSON
+// restores a stored index while the dropdown passes the array itself, and both
+// must land in the same place.
 export function applyPaletteGlobal(palette, paletteIndex = -1) {
+  if (typeof palette === 'number') {
+    paletteIndex = palette;
+    palette = NICE_PALETTES[paletteIndex] || null;
+  }
   currentPalette = palette;
-  currentPaletteIndex = paletteIndex;
+  currentPaletteIndex = palette ? paletteIndex : -1;
+  if (!palette) return;
   TOOLS.forEach(t => applyPaletteToTool(t, palette));
-  if (currentTool && window.buildPanel) {
+  // buildPanel is imported directly; the old `window.buildPanel` guard was
+  // never true, so the panel and canvas silently never refreshed.
+  if (currentTool) {
     buildPanel(currentTool);
     renderTool();
   }

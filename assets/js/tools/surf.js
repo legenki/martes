@@ -95,9 +95,9 @@ export default {
   controls: [
     { type:'color',    id:'bgColor',      label:'Background', default:'#001220' },
     { type:'btngroup', id:'fillType',     label:'Fill type',  default:'gradient', options:['Gradient','Solid'], values:['gradient','solid'] },
-    { type:'color',    id:'color1',       label:'Color 1',    default:'hsl(208,77%,50%)' },
-    { type:'color',    id:'color2',       label:'Color 2',    default:'hsl(208,74%,93%)' },
-    { type:'color',    id:'solidColor',   label:'Solid color',default:'hsl(32,100%,51%)' },
+    { type:'color',    id:'color1',       label:'Color 1',    default:'#1d86e2' },
+    { type:'color',    id:'color2',       label:'Color 2',    default:'#e0eefa' },
+    { type:'color',    id:'solidColor',   label:'Solid color',default:'#ff8a05' },
     { type:'btngroup', id:'style',        label:'Wave style', default:4, options:['1','2','3','4'], values:[1,2,3,4] },
     { type:'range',    id:'frequency',    label:'Layers',     default:7,  min:1,  max:20, step:1 },
     { type:'range',    id:'scaleConstant',label:'Spacing',    default:35, min:5,  max:150,step:5 },

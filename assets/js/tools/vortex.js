@@ -72,8 +72,8 @@ export default {
   render: renderVortex,
   controls: [
     { type:'color',    id:'bgColor',          label:'Background',   default:'#0d0d1a' },
-    { type:'color',    id:'color1',            label:'Color top',    default:'hsl(184,74%,44%)' },
-    { type:'color',    id:'color2',            label:'Color bottom', default:'hsl(332,87%,70%)' },
+    { type:'color',    id:'color1',            label:'Color top',    default:'#1db8c3' },
+    { type:'color',    id:'color2',            label:'Color bottom', default:'#f570ae' },
     { type:'btngroup', id:'fillType',          label:'Fill type',   default:'gradient', options:['Gradient','Solid'], values:['gradient','solid'] },
     { type:'btngroup', id:'modOpacity',        label:'Opacity',     default:'fade', options:['Fade↓','Fade↑','Random','Solid'], values:['fade','fade-in','random',''] },
     { type:'btngroup', id:'lineCap',           label:'Line cap',    default:'round', options:['Round','Butt','Square'], values:['round','butt','square'] },

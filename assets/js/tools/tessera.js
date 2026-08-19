@@ -130,7 +130,7 @@ export default {
   render: renderTessera,
   controls: [
     { type:'color',    id:'bgColor',       label:'Background',  default:'#ffffff' },
-    { type:'color',    id:'baseColor',     label:'Base color',  default:'hsl(212,91%,55%)' },
+    { type:'color',    id:'baseColor',     label:'Base color',  default:'#2485f5' },
     { type:'toggle',   id:'autoColors',    label:'Auto light/dark', default:true },
     { type:'color',    id:'lightColor',    label:'Light face',  default:'#7b9cff' },
     { type:'color',    id:'darkColor',     label:'Dark face',   default:'#1a2e8a' },

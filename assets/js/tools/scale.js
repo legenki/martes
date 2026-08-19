@@ -51,7 +51,7 @@ export default {
   desc: 'Fish-scale staggered circle grid',
   render: renderScale,
   controls: [
-    { type:'color', id:'bgColor',     label:'Background', default:'#111' },
+    { type:'color', id:'bgColor',     label:'Background', default:'#111111' },
     { type:'range', id:'hue1',        label:'Hue from',   default:150,   min:0,      max:360,  step:1 },
     { type:'range', id:'hue2',        label:'Hue to',     default:350,   min:0,      max:360,  step:1 },
     { type:'range', id:'saturation',  label:'Saturation', default:85,    min:15,     max:100,  step:1 },

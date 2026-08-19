@@ -1,6 +1,10 @@
-import { svg, currentTool, toolState, canvasW, canvasH } from './core.js';
+import { svg, currentTool, toolState, canvasW, canvasH,
+         getState, renderTool, rndInt, pick, toHex } from './core.js';
 import { currentPaletteIndex, applyPaletteGlobal } from './palettes.js';
-import { TOOLS, selectTool } from './registry.js';
+import { TOOLS, selectTool, buildPanel } from './registry.js';
+import { pushUndo } from './history.js';
+import { BB_SHAPES } from './tools/burst.js';
+import { MM_SHAPES } from './tools/tessera.js';
 
 // ═══════════════════════════════════════════════════════════════
 // ACTION BUTTONS
@@ -35,7 +39,9 @@ export function doRandomize() {
       // Background colors tend to be dark, foreground/shape colors brighter
       const isBg = c.id === 'bgColor';
       const lit  = isBg ? rndInt(5, 25) : rndInt(45, 80);
-      s[c.id] = `hsl(${h},${sat}%,${lit}%)`;
+      // Normalised to hex: state feeds both the canvas and the swatch
+      // <input type="color">, which renders anything non-hex as black.
+      s[c.id] = toHex(`hsl(${h},${sat}%,${lit}%)`);
 
     } else if (c.type === 'btngroup') {
       // Always pick from values array if present, else options (when options === values)
@@ -73,7 +79,7 @@ export function doSaveSVG() {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-async function doCopy() {
+export async function doCopy() {
   try {
     await navigator.clipboard.writeText(getSVGString());
     const btn = document.getElementById('btnCopy');
@@ -162,12 +168,20 @@ export function doSavePNG() {
   img.src = url;
 }
 
-document.getElementById('btnRandomize').addEventListener('click', doRandomize);
-document.getElementById('btnSave').addEventListener('click', doSaveSVG);
-  document.getElementById('btnExport').addEventListener('click', doExportJSON);
-  document.getElementById('btnImport').addEventListener('click', doImportJSON);
-document.getElementById('btnCopy').addEventListener('click', doCopy);
-document.getElementById('btnPng').addEventListener('click', doSavePNG);
+// Bind each action button if it is present. A missing node used to throw
+// here, and because this module is imported for its side effects that single
+// TypeError took down every later binding with it.
+const ACTION_BUTTONS = {
+  btnRandomize: doRandomize,
+  btnSave:      doSaveSVG,
+  btnExport:    doExportJSON,
+  btnImport:    doImportJSON,
+  btnCopy:      doCopy,
+  btnPng:       doSavePNG,
+};
+for (const [id, handler] of Object.entries(ACTION_BUTTONS)) {
+  document.getElementById(id)?.addEventListener('click', handler);
+}
 
 export function getSVGString() {
   const clone = svg.cloneNode(true);
