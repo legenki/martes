@@ -1,4 +1,6 @@
 // ── 20. rrreflection — 4-group concentric circles from edges ──
+import { svgEl } from '../core.js';
+
 function renderMirror(svg, W, H, s) {
   const defs = svgEl('defs');
   // 4 gradients — top, bottom, left, right groups
@@ -34,7 +36,7 @@ function renderMirror(svg, W, H, s) {
   });
 }
 
-TOOLS.push({
+export default {
   cat: 'Form', slug: 'mirror', name: 'Mirror', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 A7 7 0 0 0 10 17"/><path d="M10 3 A7 7 0 0 1 10 17"/><path d="M10 3 L10 17" stroke-dasharray="1.5 2"/></svg>',
   desc: 'Reflected concentric circles from edges',
   render: renderMirror,
@@ -47,4 +49,4 @@ TOOLS.push({
     { type:'range', id:'strokeWidth', label:'Stroke',     default:2,   min:0.5, max:12,  step:0.5 },
     { type:'range', id:'opacity',     label:'Opacity',    default:1,   min:0.1, max:1,   step:0.05 },
   ]
-});
+}

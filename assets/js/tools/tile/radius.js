@@ -1,4 +1,7 @@
 // 1. Radius — clip each cell with one of five corner-circles, fill with random palette colour.
+import { svgEl } from '../../core.js';
+import { tileGrid, pickFrom, chance, clipCircleInCell, addClipPath, addDropShadow, setupTile, registerTilePreset } from '../_helpers.js';
+
 function renderTileRadius(svg, W, H, s) {
   const { defs, pal, grid, freq } = setupTile(svg, W, H, s);
   const shadow = s.shadow ? addDropShadow(defs, 12, 0.25) : null;
@@ -22,9 +25,9 @@ function renderTileRadius(svg, W, H, s) {
   });
 }
 
-registerTilePreset({
+export default {
   slug:'tile-radius', name:'Radius', icon:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14"/><path d="M10 3 L10 17 M3 10 L17 10"/><path d="M3 3 A4 4 0 0 1 7 7"/><path d="M17 17 A4 4 0 0 1 13 13"/></svg>', render:renderTileRadius,
   palette:['#FFFFFF','#3B3F45','#3FFFB2','#3EECFF','#97F4FF','#FF3D8B'],
   defaults:{ grid:'4x6', frequency:1, shadow:false },
   extras:['grid','frequency','shadow']
-});
+}

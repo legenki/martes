@@ -3,6 +3,8 @@
 // Each quadtree cell → draw triangle (3 of 4 corners randomly chosen)
 // gap = padding inside each cell
 
+import { rnd, rndInt, map, svgEl } from '../core.js';
+
 function qtInsert(node, point) {
   if (node.points.length < node.capacity || node.depth >= node.maxDepth) {
     node.points.push(point);
@@ -77,7 +79,7 @@ function renderQuartz(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Weave', slug: 'quartz', name: 'Quartz', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14"/><path d="M3 3 L17 17 M17 3 L3 17"/></svg>',
   desc: 'Quadtree triangle grid',
   render: renderQuartz,
@@ -89,4 +91,4 @@ TOOLS.push({
     { type:'range',  id:'gap',         label:'Gap',          default:0,   min:0,   max:20,  step:0.5 },
     { type:'range',  id:'strokeWidth', label:'Stroke width', default:2,   min:0.5, max:8,   step:0.5 },
   ]
-});
+}

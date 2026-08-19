@@ -1,4 +1,7 @@
 // 11. Symmetry — diamonds (rotated squares) with adjustable border-radius.
+import { svgEl } from '../../core.js';
+import { tileGrid, pickFrom, chance, rotateAttr, setupTile, registerTilePreset } from '../_helpers.js';
+
 function renderTileSymmetry(svg, W, H, s) {
   const { defs, pal, grid, freq } = setupTile(svg, W, H, s);
   const circularity = s.circularity ?? 0.5;
@@ -20,9 +23,9 @@ function renderTileSymmetry(svg, W, H, s) {
   });
 }
 
-registerTilePreset({
+export default {
   slug:'tile-symmetry', name:'Symmetry', icon:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2 L18 10 L10 18 L2 10 Z"/><path d="M10 6 L14 10 L10 14 L6 10 Z" fill="currentColor" opacity="0.25"/></svg>', render:renderTileSymmetry,
   palette:['#FFFFFF','#97F4FF','#00FFF3','#00A1FF','#FF8DFF','#FF007E'],
   defaults:{ grid:'4x6', frequency:1, circularity:0.5 },
   extras:['grid','frequency','circularity']
-});
+}

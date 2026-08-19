@@ -1,4 +1,6 @@
 // ── 4. sssurf — wave generator ──
+import { rnd, map, uid, svgEl } from '../core.js';
+
 function renderSurf(svg, W, H, s) {
   const defs = svgEl('defs');
   let fill;
@@ -86,7 +88,7 @@ function renderSurf(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Flow', slug: 'surf', name: 'Surf', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14 Q6 8 10 12 T18 10"/><path d="M2 17 L18 17"/></svg>',
   desc: 'Stacked bezier wave layers',
   render: renderSurf,
@@ -102,4 +104,4 @@ TOOLS.push({
     { type:'range',    id:'numPoints',    label:'Points',     default:12, min:3,  max:30, step:1 },
     { type:'range',    id:'maxAmplitude', label:'Amplitude',  default:50, min:5,  max:200,step:5 },
   ]
-});
+}

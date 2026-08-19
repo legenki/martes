@@ -7,6 +7,8 @@
 //   Rough mode:  straight polygon lines
 //   Gradient: vertical linearGradient spanning full canvas height
 
+import { rnd, rndInt, map, uid, svgEl } from '../core.js';
+
 function splatBlobPath(N, splatterLevel, cx, cy, W, H, smooth) {
   // Exact Two.js original:
   //   two.height = H (canvas height, was 700 in original but we scale)
@@ -139,7 +141,7 @@ function renderSplat(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Form', slug: 'splat', name: 'Splat', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 C13 3 15 5 15 8 C18 9 17 13 14 14 C14 17 11 18 9 16 C6 18 3 16 4 13 C2 11 3 7 6 7 C7 4 9 3 10 3 Z"/></svg>',
   desc: 'Organic blob',
   render: renderSplat,
@@ -154,4 +156,4 @@ TOOLS.push({
     { type:'range',    id:'splatterLevel', label:'Splatter',     default:700, min:0,   max:700, step:5 },
     { type:'range',    id:'splats',        label:'Extra splats', default:0,   min:0,   max:8,   step:1 },
   ]
-});
+}

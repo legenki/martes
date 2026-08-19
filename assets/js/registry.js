@@ -1,3 +1,41 @@
+document.title = "REGISTRY RUNNING";
+import { setCurrentTool, rndInt, pick, map, RATIOS, canvasW, canvasH, currentTool, toolState, svg, resizeCanvas, renderTool, getState } from './core.js';
+import { currentPalette, currentPaletteIndex, applyPaletteToTool, applyPaletteGlobal } from './palettes.js';
+import splat from './tools/splat.js';
+import dust from './tools/dust.js';
+import prism from './tools/prism.js';
+import leaf from './tools/leaf.js';
+import drift from './tools/drift.js';
+import coil from './tools/coil.js';
+import wave from './tools/wave.js';
+import orbit from './tools/orbit.js';
+import vortex from './tools/vortex.js';
+import slash from './tools/slash.js';
+import mirror from './tools/mirror.js';
+import ripple from './tools/ripple.js';
+import bloom from './tools/bloom.js';
+import flux from './tools/flux.js';
+import quartz from './tools/quartz.js';
+import haze from './tools/haze.js';
+import shine from './tools/shine.js';
+import surf from './tools/surf.js';
+import scale from './tools/scale.js';
+import burst from './tools/burst.js';
+import halo from './tools/halo.js';
+import whorl from './tools/whorl.js';
+import tessera from './tools/tessera.js';
+import terrain from './tools/tile/terrain.js';
+import symmetry from './tools/tile/symmetry.js';
+import bloks from './tools/tile/bloks.js';
+import disque from './tools/tile/disque.js';
+import trigram from './tools/tile/trigram.js';
+import mixtape from './tools/tile/mixtape.js';
+import ring from './tools/tile/ring.js';
+import blossom from './tools/tile/blossom.js';
+import veil from './tools/tile/veil.js';
+import radius from './tools/tile/radius.js';
+import odessa from './tools/tile/odessa.js';
+
 // ═══════════════════════════════════════════════════════════════
 // MARTES — UI registry
 //
@@ -6,7 +44,43 @@
 // sidebar build, panel build, control widgets, action buttons,
 // random/save/copy, and the public window.martesInit() entry.
 // ═══════════════════════════════════════════════════════════════
-const TOOLS = [];
+const TOOLS = [
+  splat,
+  dust,
+  prism,
+  leaf,
+  drift,
+  coil,
+  wave,
+  orbit,
+  vortex,
+  slash,
+  mirror,
+  ripple,
+  bloom,
+  flux,
+  quartz,
+  haze,
+  shine,
+  surf,
+  scale,
+  burst,
+  halo,
+  whorl,
+  tessera,
+  terrain,
+  symmetry,
+  bloks,
+  disque,
+  trigram,
+  mixtape,
+  ring,
+  blossom,
+  veil,
+  radius,
+  odessa
+];
+
 
 // Shared custom-shape stores. Declared here as globals so registry.js
 // helpers can reference them even before burst.js/tessera.js execute.
@@ -24,94 +98,6 @@ function scheduleRender() {
   requestAnimationFrame(() => { _renderPending = false; renderTool(); });
 }
 
-// ═══════════════════════════════════════════════════════════════
-// UNDO / REDO — stack of 20 snapshots
-// ═══════════════════════════════════════════════════════════════
-const UNDO_LIMIT = 20;
-const _undoStack = [];
-let   _redoStack = [];
-
-// A snapshot is one of two kinds:
-//   { kind: 'tool', slug, data }       — single-tool state (range/colour/etc)
-//   { kind: 'all',  toolState, palette, paletteIndex }
-//                                       — global state (palette change)
-function _snapshotTool() {
-  if (!currentTool) return null;
-  return { kind: 'tool', slug: currentTool.slug,
-           data: JSON.stringify(toolState[currentTool.slug] || {}) };
-}
-function _snapshotAll() {
-  return {
-    kind: 'all',
-    toolState: JSON.stringify(toolState),
-    palette: currentPalette ? [...currentPalette] : null,
-    paletteIndex: currentPaletteIndex
-  };
-}
-
-function pushUndo() {
-  if (!currentTool) return;
-  const snap = _snapshotTool();
-  if (!snap) return;
-  // De-dupe consecutive identical tool-only pushes.
-  const top = _undoStack[_undoStack.length - 1];
-  if (top && top.kind === 'tool' && top.slug === snap.slug && top.data === snap.data) return;
-  _undoStack.push(snap);
-  if (_undoStack.length > UNDO_LIMIT) _undoStack.shift();
-  _redoStack = [];
-}
-
-// Used by palette-change — saves global state so undo restores colours
-// across every tool (not just the active one).
-function pushUndoGlobal() {
-  _undoStack.push(_snapshotAll());
-  if (_undoStack.length > UNDO_LIMIT) _undoStack.shift();
-  _redoStack = [];
-}
-
-function applyStateSnap(snap) {
-  if (snap.kind === 'all') {
-    // Restore every tool's state at once.
-    const restored = JSON.parse(snap.toolState);
-    Object.keys(toolState).forEach(k => delete toolState[k]);
-    Object.assign(toolState, restored);
-    if (typeof currentPalette !== 'undefined') {
-      currentPalette = snap.palette;
-      currentPaletteIndex = snap.paletteIndex;
-      // Update the palette dropdown button (if present).
-      if (window._refreshPaletteButton) window._refreshPaletteButton();
-    }
-  } else if (snap.kind === 'tool') {
-    toolState[snap.slug] = JSON.parse(snap.data);
-  }
-  // Restore canvas ratio (if saved with the snapshot).
-  if (currentTool) {
-    const r = (toolState[currentTool.slug] || {})._ratio;
-    if (r && RATIOS[r]) {
-      [canvasW, canvasH] = RATIOS[r];
-      const sel = document.getElementById('ratioSelect');
-      if (sel) sel.value = r;
-      resizeCanvas();
-    }
-    buildPanel(currentTool);
-    renderTool();
-  }
-}
-
-function undo() {
-  if (!currentTool || _undoStack.length === 0) return;
-  // Mirror the kind of the snap we're about to apply.
-  const top = _undoStack[_undoStack.length - 1];
-  _redoStack.push(top.kind === 'all' ? _snapshotAll() : _snapshotTool());
-  applyStateSnap(_undoStack.pop());
-}
-
-function redo() {
-  if (!currentTool || _redoStack.length === 0) return;
-  const top = _redoStack[_redoStack.length - 1];
-  _undoStack.push(top.kind === 'all' ? _snapshotAll() : _snapshotTool());
-  applyStateSnap(_redoStack.pop());
-}
 
 // ═══════════════════════════════════════════════════════════════
 // DEBOUNCE helper
@@ -149,10 +135,11 @@ function buildSidebar() {
 // SELECT TOOL
 // ═══════════════════════════════════════════════════════════════
 function selectTool(tool) {
-  currentTool = tool;
+  setCurrentTool(tool);
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.toggle('active', b.dataset.slug === tool.slug));
   document.getElementById('btnRandomize').disabled = false;
   document.getElementById('btnSave').disabled = false;
+  document.getElementById('btnExport').disabled = false;
   document.getElementById('btnCopy').disabled = false;
   document.getElementById('btnPng').disabled = false;
   svg.setAttribute('aria-label', `${tool.name} — ${tool.desc || 'generated artwork'}`);
@@ -168,7 +155,7 @@ function selectTool(tool) {
 // ═══════════════════════════════════════════════════════════════
 // BUILD PANEL
 // ═══════════════════════════════════════════════════════════════
-function buildPanel(tool) {
+export function buildPanel(tool) {
   document.getElementById('sec-tool').innerHTML = `
     <div class="tool-card">
       <div class="tool-card-name">
@@ -730,184 +717,13 @@ document.getElementById('ratioSelect').addEventListener('change', function() {
   renderTool();
 });
 
-// ═══════════════════════════════════════════════════════════════
-// ACTION BUTTONS
-// ═══════════════════════════════════════════════════════════════
-function doRandomize() {
-  if (!currentTool) return;
-  pushUndo();
-  const s = getState();
 
-  currentTool.controls.forEach(c => {
-    if (c.type === 'range') {
-      // For opacity/probability controls keep a reasonable minimum so result stays visible
-      const isOpacity = c.id === 'opacity' || c.id === 'probability';
-      // Minimum floor: 40% of the control's max (so result is not nearly invisible)
-      const lo = isOpacity ? Math.max(c.min, c.max * 0.4) : c.min;
-      const hi = c.max;
-      // Decimal places for toFixed — robust against exponential notation
-      // (e.g. step = 1e-5 stringifies as "1e-5", no decimal point).
-      let decimals = 0;
-      if (c.step < 1 && c.step > 0) {
-        decimals = Math.max(0, Math.ceil(-Math.log10(c.step)));
-      }
-      s[c.id] = parseFloat((Math.random() * (hi - lo) + lo).toFixed(decimals));
-
-    } else if (c.type === 'toggle') {
-      s[c.id] = Math.random() > 0.5;
-
-    } else if (c.type === 'color') {
-      // Generate a vivid random HSL color — works for any render function regardless of format
-      const h   = rndInt(0, 360);
-      const sat = rndInt(55, 95);
-      // Background colors tend to be dark, foreground/shape colors brighter
-      const isBg = c.id === 'bgColor';
-      const lit  = isBg ? rndInt(5, 25) : rndInt(45, 80);
-      s[c.id] = `hsl(${h},${sat}%,${lit}%)`;
-
-    } else if (c.type === 'btngroup') {
-      // Always pick from values array if present, else options (when options === values)
-      const pool = c.values !== undefined ? c.values : c.options;
-      s[c.id] = pick(pool);
-
-    } else if (c.type === 'bbshapes') {
-      const allIds = BB_SHAPES.map(sh => sh.id);
-      const count = rndInt(2, 5);
-      s[c.id] = [...allIds].sort(() => Math.random() - 0.5).slice(0, count);
-
-    } else if (c.type === 'mmshapes') {
-      const allIds = MM_SHAPES.map(sh => sh.id);
-      const count = rndInt(1, 3);
-      s[c.id] = [...allIds].sort(() => Math.random() - 0.5).slice(0, count);
-    }
-    // svgshape / custom shape pickers: leave unchanged (no sensible random)
-  });
-
-  // Tool-specific randomize hook (e.g. seed)
-  if (typeof currentTool.randomize === 'function') {
-    currentTool.randomize(s, canvasW, canvasH);
-  }
-
-  buildPanel(currentTool);
-  renderTool();
-}
-
-function doSaveSVG() {
-  const svgStr = getSVGString();
-  const blob = new Blob([svgStr], {type:'image/svg+xml'});
-  const url = URL.createObjectURL(blob);
-  const a = Object.assign(document.createElement('a'), {href:url, download:`${currentTool?.slug || 'artwork'}.svg`});
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-async function doCopy() {
-  try {
-    await navigator.clipboard.writeText(getSVGString());
-    const btn = document.getElementById('btnCopy');
-    const orig = btn.innerHTML;
-    btn.innerHTML = '✓ Copied';
-    setTimeout(() => { btn.innerHTML = orig; }, 1500);
-  } catch(e) { alert('Copy failed: ' + e); }
-}
-
-function doSavePNG() {
-  if (!currentTool) return;
-  const svgStr = getSVGString();
-  const blob = new Blob([svgStr], {type:'image/svg+xml;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const img = new Image();
-  img.onload = () => {
-    const c = document.createElement('canvas');
-    c.width  = canvasW * 2;  // 2x for retina quality
-    c.height = canvasH * 2;
-    const ctx = c.getContext('2d');
-    // Draw at full retina size in one call — sharper than scale() + 1x draw,
-    // and lets the browser pick the best resampler.
-    ctx.drawImage(img, 0, 0, c.width, c.height);
-    URL.revokeObjectURL(url);
-    c.toBlob(pngBlob => {
-      const pngUrl = URL.createObjectURL(pngBlob);
-      const a = Object.assign(document.createElement('a'), {
-        href: pngUrl,
-        download: `${currentTool?.slug || 'artwork'}.png`
-      });
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(pngUrl), 1000);
-    }, 'image/png');
-  };
-  img.onerror = () => {
-    URL.revokeObjectURL(url);
-    alert('PNG export failed — the SVG may contain unsupported features');
-  };
-  img.src = url;
-}
-
-document.getElementById('btnRandomize').addEventListener('click', doRandomize);
-document.getElementById('btnSave').addEventListener('click', doSaveSVG);
-document.getElementById('btnCopy').addEventListener('click', doCopy);
-document.getElementById('btnPng').addEventListener('click', doSavePNG);
-
-function getSVGString() {
-  const clone = svg.cloneNode(true);
-  clone.removeAttribute('style');
-  clone.setAttribute('width', canvasW);
-  clone.setAttribute('height', canvasH);
-  return '<?xml version="1.0" encoding="UTF-8"?>\n' + clone.outerHTML;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// KEYBOARD SHORTCUTS
-// ═══════════════════════════════════════════════════════════════
-// Coalesce rapid arrow-key tool switching: one rAF per frame, so
-// holding ↑/↓ doesn't pile up 60+ buildPanel/renderTool calls per second.
-let _navPendingDelta = 0;
-let _navScheduled = false;
-function navigateTool(delta) {
-  _navPendingDelta += delta;
-  if (_navScheduled) return;
-  _navScheduled = true;
-  requestAnimationFrame(() => {
-    _navScheduled = false;
-    if (!currentTool) { _navPendingDelta = 0; return; }
-    const idx  = TOOLS.indexOf(currentTool);
-    const next = Math.max(0, Math.min(TOOLS.length - 1, idx + _navPendingDelta));
-    _navPendingDelta = 0;
-    if (next !== idx) selectTool(TOOLS[next]);
-  });
-}
-
-document.addEventListener('keydown', (e) => {
-  // Skip when typing in inputs/textareas
-  const tag = (e.target.tagName || '').toLowerCase();
-  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
-
-  // Ctrl/Cmd+Z = undo, Ctrl/Cmd+Y or Ctrl/Cmd+Shift+Z = redo
-  if ((e.ctrlKey || e.metaKey) && !e.altKey) {
-    if (e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); return; }
-    if (e.key === 'z' && e.shiftKey)  { e.preventDefault(); redo(); return; }
-    if (e.key === 'y')                { e.preventDefault(); redo(); return; }
-  }
-
-  // Single-key shortcuts (no modifiers)
-  if (e.ctrlKey || e.metaKey || e.altKey) return;
-
-  switch (e.key.toLowerCase()) {
-    case 'r': e.preventDefault(); doRandomize(); break;
-    case 's': e.preventDefault(); doSaveSVG(); break;
-    case 'p': e.preventDefault(); doSavePNG(); break;
-    case 'c': e.preventDefault(); doCopy(); break;
-    case 'arrowdown': e.preventDefault(); navigateTool(+1); break;
-    case 'arrowup':   e.preventDefault(); navigateTool(-1); break;
-  }
-});
-
-// ═══════════════════════════════════════════════════════════════
-// INIT — exposed as a global; index.html calls it after every tool
-// file has had a chance to push into TOOLS.
-// ═══════════════════════════════════════════════════════════════
-window.martesInit = function() {
+function martesInit() { document.title="INIT START"; try {
   buildSidebar();
   resizeCanvas();
-  selectTool(TOOLS[0]);
-};
+  selectTool(TOOLS[0]); document.title="TOOLS: " + TOOLS.length;
+} catch(e) { document.title = "ERR: " + e.message; } };
+
+// Initialize everything
+martesInit();
+console.log('REGISTRY LOADED');

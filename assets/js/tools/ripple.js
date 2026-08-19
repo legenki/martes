@@ -1,4 +1,6 @@
 // ── 12. sssquiggly — squiggly background lines ──────────
+import { rnd, lerp, svgEl, lerpColor } from '../core.js';
+
 function renderRipple(svg, W, H, s) {
   const bg = svgEl('rect',{x:0,y:0,width:W,height:H,fill:s.bgColor});
   svg.appendChild(bg);
@@ -31,7 +33,7 @@ function renderRipple(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Flow', slug: 'ripple', name: 'Ripple', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6 Q6 3 10 6 T18 6"/><path d="M2 10 Q6 7 10 10 T18 10"/><path d="M2 14 Q6 11 10 14 T18 14"/></svg>',
   desc: 'Squiggly flowing line background',
   render: renderRipple,
@@ -44,4 +46,4 @@ TOOLS.push({
     { type:'range', id:'segmentLength',label:'Wiggle',     default:60, min:10, max:200, step:5 },
     { type:'range', id:'strokeWidth',  label:'Stroke',     default:2,  min:0.5,max:10,  step:0.5 },
   ]
-});
+}

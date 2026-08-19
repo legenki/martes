@@ -8,7 +8,7 @@
 // command letter, digit, sign, decimal, comma, or whitespace.
 // This blocks XSS payloads injected via custom shape textareas.
 const _SVG_PATH_SAFE = /[^MmLlHhVvCcSsQqTtAaZz0-9.,\s\-+eE]/g;
-function sanitizeSvgPath(d) {
+export function sanitizeSvgPath(d) {
   if (typeof d !== 'string') return '';
   return d.replace(_SVG_PATH_SAFE, '');
 }
@@ -16,7 +16,7 @@ function sanitizeSvgPath(d) {
 // ── SVG Shape Input Parser ─────────────────────────────────────
 // Accepts: full <svg>…</svg>, just <path d="…"/>, or bare d-string
 // Returns: { d, vbW, vbH, fillRule } or null on failure
-function parseSvgShapeInput(text) {
+export function parseSvgShapeInput(text) {
   text = text.trim();
   if (!text) return null;
 
@@ -76,7 +76,7 @@ function parseSvgShapeInput(text) {
 
 // Scale a path d-string to fit in targetW×targetH centered at (cx,cy)
 // Uses SVG getBBox via a temporary element in the document
-function normalizeSvgPath(d, fillRule, targetW, targetH, centerX, centerY) {
+export function normalizeSvgPath(d, fillRule, targetW, targetH, centerX, centerY) {
   // Create temp SVG to measure bounding box
   const tmpSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   tmpSvg.style.cssText = 'position:absolute;visibility:hidden;width:0;height:0;overflow:hidden';
@@ -103,7 +103,7 @@ function normalizeSvgPath(d, fillRule, targetW, targetH, centerX, centerY) {
 
 // ── High-quality Voronoi via grid-accelerated Lloyd relaxation ──
 // Grid resolution adapts to point count for uniform results at all amounts.
-function buildUniformVoronoi(W, H, N, cx, cy, biasStrength) {
+export function buildUniformVoronoi(W, H, N, cx, cy, biasStrength) {
   // Step 1: seed with random-bias toward focus point
   function seedPt() {
     const rx = Math.random(), ry = Math.random();

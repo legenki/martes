@@ -4,6 +4,8 @@
 //   M 0 y  Q (W×0.25) amp1  (W/2) (H/2)  Q (W×0.75) amp2  W y
 // amp1 = map(amplitude, 0, 100, H/2, -100) — controls upper arc
 // amp2 = map(amplitude, 0, 100, H/2, H+100) — controls lower arc
+import { rnd, map, uid, svgEl } from '../core.js';
+
 function renderWave(svg, W, H, s) {
   const defs = svgEl('defs');
   const gradId = uid('osc-grad');
@@ -66,7 +68,7 @@ function renderWave(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Flow', slug: 'wave', name: 'Wave', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10 Q6 4 10 10 T18 10"/></svg>',
   desc: 'S-curve oscillating lines',
   render: renderWave,
@@ -83,4 +85,4 @@ TOOLS.push({
     { type:'range',    id:'maxRotate',     label:'Rotation',   default:0,   min:0,   max:180, step:1 },
     { type:'range',    id:'dashFactor',    label:'Dash',       default:0,   min:0,   max:10,  step:0.5 },
   ]
-});
+}

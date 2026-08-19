@@ -1,5 +1,5 @@
 {
-  "name": "martes",
+  "name": "martes", 
   "version": "1.0.0",
   "description": "Local design canvas — 34 SVG generators and a 360-texture browser, served from a single Node process.",
   "main": "server.js",

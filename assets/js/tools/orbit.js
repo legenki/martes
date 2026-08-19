@@ -3,6 +3,8 @@
 // each scaled by i * scaleConstant, rotated by rotationConstant * i degrees.
 // Shape paths defined in 800×800 viewBox, centered at (400,400).
 
+import { rnd, map, uid, svgEl } from '../core.js';
+
 const GG_HEXAGON         = 'M400 250L529.904 325V475L400 550L270.096 475V325L400 250Z';
 const GG_ROUNDED_HEXAGON = 'M390 255.773C396.188 252.201 403.812 252.201 410 255.774L519.904 319.227C526.084 322.792 529.904 329.368 529.904 336.5V463.5C529.904 470.632 526.084 477.208 519.904 480.773L410 544.226C403.812 547.799 396.188 547.799 390 544.226L280.096 480.773C273.916 477.208 270.096 470.632 270.096 463.5V336.5C270.096 329.368 273.916 322.792 280.096 319.227L390 255.773Z';
 const GG_ROUNDED_TRIANGLE = 'M392.83 239.489C395.767 233.553 404.233 233.553 407.17 239.489L524.189 475.952C527.371 482.395 522.715 490 515.519 490H284.481C277.285 490 272.629 482.395 275.811 475.952L392.83 239.489Z';
@@ -83,7 +85,7 @@ function renderOrbit(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Weave', slug: 'orbit', name: 'Orbit', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="4"/><circle cx="10" cy="10" r="1.5"/></svg>',
   desc: 'Nested concentric shapes with incremental rotation',
   render: renderOrbit,
@@ -105,4 +107,4 @@ TOOLS.push({
     { type:'range',    id:'baseStrokeWidth',   label:'Stroke width', default:5,   min:1,   max:20,  step:0.5 },
     { type:'range',    id:'opacity',           label:'Opacity',      default:1,   min:0.1, max:1,   step:0.01 },
   ]
-});
+}

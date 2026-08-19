@@ -1,4 +1,6 @@
 // ── 8. cccircular — circular gradient patterns ────────────
+import { uid, svgEl, lerpColor } from '../core.js';
+
 function renderHalo(svg, W, H, s) {
   const defs = svgEl('defs');
   svg.appendChild(defs);
@@ -27,7 +29,7 @@ function renderHalo(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Form', slug: 'halo', name: 'Halo', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="4"/><path d="M10 1 L10 4 M10 16 L10 19 M1 10 L4 10 M16 10 L19 10"/></svg>',
   desc: 'Radial gradient circle layers',
   render: renderHalo,
@@ -38,4 +40,4 @@ TOOLS.push({
     { type:'range', id:'rings',   label:'Rings',   default:8,   min:2, max:20,  step:1 },
     { type:'range', id:'opacity', label:'Opacity', default:0.7, min:0.1,max:1,  step:0.05 },
   ]
-});
+}

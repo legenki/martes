@@ -1,4 +1,7 @@
 // 7. Bloks — a rotated triangle / square + an arch on top.
+import { svgEl } from '../../core.js';
+import { tileGrid, pickFrom, chance, rotateAttr, pathPolygon, clipCircleInCell, addClipPath, addDropShadow, setupTile, registerTilePreset } from '../_helpers.js';
+
 function renderTileBloks(svg, W, H, s) {
   const { defs, pal, grid, freq } = setupTile(svg, W, H, s);
   const shadow = s.shadow ? addDropShadow(defs, 12, 0.25) : null;
@@ -33,9 +36,9 @@ function renderTileBloks(svg, W, H, s) {
   });
 }
 
-registerTilePreset({
+export default {
   slug:'tile-bloks', name:'Bloks', icon:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" transform="rotate(45 6 6)"/><rect x="11" y="3" width="6" height="6"/><rect x="3" y="11" width="6" height="6"/><path d="M11 17 L17 17 L17 11 A3 3 0 0 0 11 14 Z"/></svg>', render:renderTileBloks,
   palette:['#FFFFFF','#3B3F45','#3FFFB2','#3EECFF','#97F4FF','#FF3D8B'],
   defaults:{ grid:'4x6', frequency:0.6, shadow:false },
   extras:['grid','frequency','shadow']
-});
+}

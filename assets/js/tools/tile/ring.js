@@ -1,4 +1,7 @@
 // 10. Ring — two concentric ring outlines, the outer one nudged by random offset.
+import { svgEl } from '../../core.js';
+import { parseGrid, tileGrid, pickFrom, chance, rotateAttr, setupTile, registerTilePreset } from '../_helpers.js';
+
 function renderTileRing(svg, W, H, s) {
   const { defs, pal, grid, freq } = setupTile(svg, W, H, s);
   const { rows } = parseGrid(grid);
@@ -26,9 +29,9 @@ function renderTileRing(svg, W, H, s) {
   });
 }
 
-registerTilePreset({
+export default {
   slug:'tile-ring', name:'Ring', icon:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="10" r="5"/><circle cx="12" cy="10" r="5" opacity="0.5"/></svg>', render:renderTileRing,
   palette:['#9EFFD8','#FFFFFF','#9EFFD8','#232529','#9EFFD8','#9EFFD8'],
   defaults:{ grid:'2x3', frequency:1 },
   extras:['grid','frequency']
-});
+}

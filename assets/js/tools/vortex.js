@@ -5,6 +5,8 @@
 //   random rotation 0–360° around center
 //   stroke-width tapers: outer=sw+4, inner=sw-2
 //   modOpacity for fade effects
+import { rnd, map, uid, svgEl } from '../core.js';
+
 function renderVortex(svg, W, H, s) {
   const defs = svgEl('defs');
   const gradId = uid('vor-grad');
@@ -64,7 +66,7 @@ function renderVortex(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Form', slug: 'vortex', name: 'Vortex', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 A7 7 0 1 1 3 10 A4 4 0 1 1 10 6 A1.5 1.5 0 1 1 11.5 10"/></svg>',
   desc: 'Dashed concentric rings with random rotation',
   render: renderVortex,
@@ -79,4 +81,4 @@ TOOLS.push({
     { type:'range',    id:'scaleConstant',     label:'Scale',       default:33,  min:5,  max:120, step:1 },
     { type:'range',    id:'baseStrokeWidth',   label:'Stroke',      default:7,   min:1,  max:25,  step:0.5 },
   ]
-});
+}

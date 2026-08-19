@@ -1,4 +1,6 @@
 // ── 1. ttten — 10-Print diagonal lines ──────────────────────
+import { rnd, map, svgEl } from '../core.js';
+
 function renderSlash(svg, W, H, s) {
   const blockSize = s.blockSize;
   const strokeWidth = s.strokeWidth;
@@ -40,7 +42,7 @@ function renderSlash(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Weave', slug: 'slash', name: 'Slash', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 L17 3 M3 3 L17 17"/></svg>',
   desc: '10 Print-inspired diagonal line pattern',
   render: renderSlash,
@@ -54,4 +56,4 @@ TOOLS.push({
     { type:'range',    id:'strokeWidth', label:'Stroke width',  default:3.5, min:0.5,  max:20,  step:0.5 },
     { type:'range',    id:'probability', label:'Probability',   default:0.5, min:0.05, max:0.95,step:0.01 },
   ]
-});
+}

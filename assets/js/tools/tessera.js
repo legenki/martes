@@ -2,6 +2,8 @@
 // All 15 original shapes in 40×40 tile space.
 // Each shape uses base/light/dark color roles.
 // Custom shapes also supported (single-color path).
+import { pick, clamp, svgEl, rgbToHex } from '../core.js';
+
 const MM_SHAPES = [
   { id:1,  label:'Cube',         markup: (b,l,d) => `<rect width="18" height="18" transform="matrix(0.866025 0.5 -0.866025 0.5 20 2)" fill="${b}"/><rect width="18" height="18" transform="matrix(0.866025 0.5 -2.20305e-08 1 4.41162 11)" fill="${l}"/><rect width="18" height="18" transform="matrix(0.866025 -0.5 2.20305e-08 1 20 20)" fill="${d}"/>` },
   { id:2,  label:'Plank',        markup: (b,l,d) => `<rect width="64.4123" height="124.995" transform="matrix(0.24201 0.970274 0 1 4.41162 -64.7517)" fill="${b}"/><rect width="64.4123" height="124.995" transform="matrix(0.24201 -0.970274 0 1 19.9995 -2.25317)" fill="${d}"/>` },
@@ -129,7 +131,7 @@ function renderTessera(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Weave', slug: 'tessera', name: 'Tessera', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 L15 8 L10 13 L5 8 Z"/><path d="M5 12 L8 15 L5 18 L2 15 Z"/><path d="M15 12 L18 15 L15 18 L12 15 Z"/></svg>',
   desc: 'Isometric 3D tiling pattern',
   render: renderTessera,
@@ -148,4 +150,4 @@ TOOLS.push({
     { type:'range',    id:'skewY',         label:'Skew Y',      default:0,   min:-50, max:50,  step:1 },
     { type:'range',    id:'opacity',       label:'Opacity',     default:1,   min:0.1, max:1,   step:0.05 },
   ]
-});
+}

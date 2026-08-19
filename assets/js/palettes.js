@@ -1,4 +1,7 @@
-const NICE_PALETTES = [
+import { pushUndoGlobal, applyStateSnap } from './history.js';
+import { buildPanel } from './registry.js';
+import { uid, svgEl, hexToRgb, rgbToHex, parseColor, lerpColor, cubicBez, toolState, renderTool, getState, currentTool, pick } from './core.js';
+export const NICE_PALETTES = [
 ["#69d2e7","#a7dbd8","#e0e4cc","#f38630","#fa6900"],
 ["#fe4365","#fc9d9a","#f9cdad","#c8c8a9","#83af9b"],
 ["#c8c8a9","#83af9b","#fe4365","#fc9d9a","#f9cdad"],
@@ -111,13 +114,13 @@ const NICE_PALETTES = [
 // null = no palette applied yet; tools use their own defaults.
 // Once a palette is picked it becomes `currentPalette` and gets applied
 // to every tool the user switches to.
-let currentPalette = null;
-let currentPaletteIndex = -1;
+export let currentPalette = null;
+export let currentPaletteIndex = -1;
 
 // Apply `palette` (array of up to 5 hex strings) to a tool's state by
 // overwriting the first N color-typed controls. Returns true if any
 // slot was changed.
-function applyPaletteToTool(tool, palette) {
+export function applyPaletteToTool(tool, palette) {
   if (!tool || !palette) return false;
   const colorCtrls = tool.controls.filter(c => c.type === 'color');
   if (!toolState[tool.slug]) toolState[tool.slug] = {};
@@ -136,7 +139,7 @@ function applyPaletteToTool(tool, palette) {
 // Apply a palette to EVERY registered tool's state (so a later switch
 // already has palette colours pre-loaded), and also refresh the panel
 // for the currently-selected tool so swatches update visually.
-function applyPaletteGlobal(palette, paletteIndex = -1) {
+export function applyPaletteGlobal(palette, paletteIndex = -1) {
   currentPalette = palette;
   currentPaletteIndex = paletteIndex;
   TOOLS.forEach(t => applyPaletteToTool(t, palette));

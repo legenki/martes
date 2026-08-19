@@ -4,6 +4,8 @@
 // percentValue = map(i, frequency, 1, maxLength, 0) — outer ring gets most arc
 // dash = circumference * percentValue
 // rotation = map(i, frequency, 1, 360, 0) rotated around center
+import { rnd, map, uid, svgEl } from '../core.js';
+
 function renderCoil(svg, W, H, s) {
   const defs = svgEl('defs');
   const gradId = uid('coil-grad');
@@ -64,7 +66,7 @@ function renderCoil(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Form', slug: 'coil', name: 'Coil', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10 A1 1 0 0 1 11 10 A2 2 0 0 1 9 11 A3 3 0 0 1 9 7 A4 4 0 0 1 13 11 A5 5 0 0 1 7 13 A6 6 0 0 1 5 7"/></svg>',
   desc: 'Spiral of dashed concentric arcs',
   render: renderCoil,
@@ -81,4 +83,4 @@ TOOLS.push({
     { type:'range',    id:'strokeWidth', label:'Stroke',      default:7,    min:1,   max:25,   step:0.5 },
     { type:'range',    id:'offsetAngle', label:'Offset angle',default:0,    min:0,   max:360,  step:1 },
   ]
-});
+}

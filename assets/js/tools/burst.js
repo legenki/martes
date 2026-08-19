@@ -4,6 +4,9 @@
 // ── Shape library ─────────────────────────────────────────────
 // All paths centered at origin (0,0), fitting in ~±72 units radius.
 // fill:true = filled, fill:false = stroke-only
+import { rnd, clamp, lerp, map, svgEl } from '../core.js';
+import { parseSvgShapeInput, normalizeSvgPath, buildUniformVoronoi } from './_voronoi.js';
+
 const BB_SHAPES = [
   { id:'triangle',   label:'▲ Triangle',  fill:true,
     d:'M 0,-70 L 61,35 L -61,35 Z' },
@@ -148,7 +151,7 @@ function renderBurst(svg, W, H, s) {
   });
 }
 
-TOOLS.push({
+export default {
   cat: 'Form', slug: 'burst', name: 'Burst', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2 L10 18 M2 10 L18 10 M4 4 L16 16 M16 4 L4 16"/></svg>',
   desc: 'Voronoi burst — multi-shape, no overlap',
   render: renderBurst,
@@ -167,4 +170,4 @@ TOOLS.push({
     { type:'range',     id:'opacity',     label:'Opacity',    default:1,   min:0.1, max:1.0, step:0.05 },
     { type:'range',     id:'strokeW',     label:'Stroke w',   default:10,  min:2,   max:30,  step:1 },
   ]
-});
+}

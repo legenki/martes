@@ -4,6 +4,8 @@
 // nbRows       = round(H / (baseSize/2.3))
 // circle cx = i*baseSize, cy = j*(baseSize/2)
 // odd rows group gets translate(-(baseSize/2), 0)
+import { map, svgEl } from '../core.js';
+
 function renderScale(svg, W, H, s) {
   svg.appendChild(svgEl('rect', {x:0,y:0,width:W,height:H,fill:s.bgColor}));
 
@@ -44,7 +46,7 @@ function renderScale(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Weave', slug: 'scale', name: 'Scale', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10 A4 4 0 0 1 10 10 A4 4 0 0 1 18 10"/><path d="M2 14 A4 4 0 0 1 10 14 A4 4 0 0 1 18 14"/><path d="M2 6 A4 4 0 0 1 10 6 A4 4 0 0 1 18 6"/></svg>',
   desc: 'Fish-scale staggered circle grid',
   render: renderScale,
@@ -57,4 +59,4 @@ TOOLS.push({
     { type:'range', id:'circleSize',  label:'Size',       default:75,    min:25,     max:200,  step:1 },
     { type:'range', id:'noiseFreq',   label:'Variation',  default:0.0255,min:0.0055, max:0.0855,step:0.0005 },
   ]
-});
+}

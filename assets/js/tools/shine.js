@@ -6,6 +6,8 @@
 //   rotate by i * rotationFactor degrees around (W/2, H/2)
 //   Random or solid opacity per line
 //   Optional dash: stroke-dasharray = "dashFactor gapFactor"
+import { rnd, svgEl } from '../core.js';
+
 function renderShine(svg, W, H, s) {
   svg.appendChild(svgEl('rect', {x:0, y:0, width:W, height:H, fill:s.bgColor}));
 
@@ -67,7 +69,7 @@ function renderShine(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Flow', slug: 'shine', name: 'Shine', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 1 L10 19 M1 10 L19 10 M3.5 3.5 L16.5 16.5 M16.5 3.5 L3.5 16.5"/></svg>',
   desc: 'Starburst radial lines — all crossing canvas center',
   render: renderShine,
@@ -85,4 +87,4 @@ TOOLS.push({
     { type:'range',    id:'gapFactor',     label:'Gap',         default:0,    min:0,    max:125,  step:0.5 },
     { type:'range',    id:'opacity',       label:'Opacity',     default:1,    min:0.1,  max:1,    step:0.01 },
   ]
-});
+}

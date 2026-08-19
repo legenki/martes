@@ -2,6 +2,8 @@
 // Original: draws `lines` concentric circles, each at radius i * scaleConstant,
 // then applies Warp distortion: x + scribble·sin(y/rand1), y + scribble·sin(x/rand2)
 // rand1/rand2 = random integers 24–64 (fixed per render)
+import { rndInt, uid, svgEl } from '../core.js';
+
 function renderWhorl(svg, W, H, s) {
   const defs = svgEl('defs');
   const gradId = uid('scrib-grad');
@@ -70,7 +72,7 @@ function renderWhorl(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Flow', slug: 'whorl', name: 'Whorl', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4 C7 4 4 7 4 10 C4 13 7 16 10 16 C12 16 14 14 14 12 C14 10 12 8 10 8 C9 8 8 9 8 10 C8 11 9 12 10 12"/></svg>',
   desc: 'Concentric circles with sine-warp scribble distortion',
   render: renderWhorl,
@@ -86,4 +88,4 @@ TOOLS.push({
     { type:'range',    id:'dashGap',     label:'Dash gap',   default:0,    min:0,   max:150,  step:5 },
     { type:'range',    id:'opacity',     label:'Opacity',    default:1,    min:0.1, max:1,    step:0.05 },
   ]
-});
+}

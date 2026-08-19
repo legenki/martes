@@ -1,4 +1,6 @@
 // ── 5. nnnoise — SVG noise texture ────────
+import { rndInt, uid, svgEl } from '../core.js';
+
 function renderDust(svg, W, H, s) {
   const defs = svgEl('defs');
   const filterId = uid('noise');
@@ -45,7 +47,7 @@ function renderDust(svg, W, H, s) {
   svg.appendChild(svgEl('rect',{x:0,y:0,width:W,height:H,fill:s.fgColor || s.bgColor,filter:`url(#${filterId})`,opacity:s.opacity}));
 }
 
-TOOLS.push({
+export default {
   cat: 'Weave', slug: 'dust', name: 'Dust', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="0.6" fill="currentColor"/><circle cx="14" cy="4" r="0.6" fill="currentColor"/><circle cx="10" cy="10" r="0.6" fill="currentColor"/><circle cx="4" cy="14" r="0.6" fill="currentColor"/><circle cx="15" cy="15" r="0.6" fill="currentColor"/><circle cx="7" cy="16" r="0.6" fill="currentColor"/><circle cx="16" cy="10" r="0.6" fill="currentColor"/><rect x="2.5" y="2.5" width="15" height="15"/></svg>',
   desc: 'SVG noise & specular lighting texture',
   render: renderDust,
@@ -62,4 +64,4 @@ TOOLS.push({
     { type:'range',    id:'specular',     label:'Specular',      default:0.75,  min:0.1,   max:5,    step:0.05 },
     { type:'range',    id:'opacity',      label:'Opacity',       default:1,     min:0.1,   max:1,    step:0.05 },
   ]
-});
+}

@@ -1,4 +1,6 @@
 // ── 14. ffflurry — diagonal pill-shaped streaks ───────────────
+import { rnd, uid, svgEl } from '../core.js';
+
 function renderDrift(svg, W, H, s) {
   const defs = svgEl('defs');
   const gradId = uid('flurry-grad');
@@ -32,7 +34,7 @@ function renderDrift(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Flow', slug: 'drift', name: 'Drift', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14 L8 5 M7 17 L12 8 M11 17 L16 8 M15 14 L17 11"/></svg>',
   desc: 'Diagonal speed-streak pill shapes',
   render: renderDrift,
@@ -45,4 +47,4 @@ TOOLS.push({
     { type:'range', id:'thickness', label:'Thickness',  default:3,   min:1,   max:14,  step:1 },
     { type:'range', id:'multiplier',label:'Length',     default:15,  min:1,   max:33,  step:1 },
   ]
-});
+}

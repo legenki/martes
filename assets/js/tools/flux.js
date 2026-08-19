@@ -4,6 +4,8 @@
 //   feTurbulence → feGaussianBlur → feBlend → optional feColorMatrix saturate
 //   Linear or radial gradient rect as SourceGraphic
 //
+import { rndInt, uid, svgEl } from '../core.js';
+
 function renderFlux(svg, W, H, s) {
   const color1   = s.color1   || 'hsl(200,90%,50%)';
   const color2   = s.color2   || 'hsl(320,80%,55%)';
@@ -101,7 +103,7 @@ function renderFlux(svg, W, H, s) {
   svg.appendChild(rect);
 }
 
-TOOLS.push({
+export default {
   cat: 'Glow', slug: 'flux', name: 'Flux', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14 Q5 10 8 14 T14 14 T18 14"/><path d="M2 10 Q5 6 8 10 T14 10 T18 10"/><path d="M2 6 Q5 2 8 6 T14 6 T18 6" opacity="0.5"/></svg>',
   desc: 'SVG filter noise — turbulence + blur + blend gradient',
   render: renderFlux,
@@ -126,4 +128,4 @@ TOOLS.push({
   randomize(s, W, H) {
     s.seed = rndInt(1, 999);
   }
-});
+}

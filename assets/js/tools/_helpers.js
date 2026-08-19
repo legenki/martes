@@ -1,3 +1,4 @@
+import { uid } from '../core.js';
 // ═══════════════════════════════════════════════════════════════
 // TILE — shared helpers for grid presets (clip-paths, filters, palette)
 // Used by all tools/tile/*.js preset files.
@@ -6,14 +7,14 @@
 // ── Grid engine ────────────────────────────────────────────────
 // Parse "4x6" → { cols:4, rows:6 }. Convention:
 // "C x R" reads as columns × rows.
-function parseGrid(g) {
+export function parseGrid(g) {
   const [c, r] = String(g).split('x').map(Number);
   return { cols: c || 4, rows: r || 6 };
 }
 
 // Walk a cols × rows grid, calling paint() for each cell with its
 // pixel rect and 1-based row/col index (matching @size-row / @size-col).
-function tileGrid(parent, W, H, gridStr, bgColor, paint) {
+export function tileGrid(parent, W, H, gridStr, bgColor, paint) {
   const { cols, rows } = parseGrid(gridStr);
   // Background — first palette colour fills the cell wrapper.
   parent.appendChild(svgEl('rect', { x:0, y:0, width:W, height:H, fill: bgColor }));
@@ -32,31 +33,31 @@ function tileGrid(parent, W, H, gridStr, bgColor, paint) {
 }
 
 // ── Helpers ────────────────────────────────────────────────────
-function pickFrom(arr)  { return arr[Math.floor(Math.random() * arr.length)]; }
-function chance(p)      { return Math.random() < p; }
-function rotateAttr(angle, cx, cy) { return `rotate(${angle} ${cx} ${cy})`; }
+export function pickFrom(arr)  { return arr[Math.floor(Math.random() * arr.length)]; }
+export function chance(p)      { return Math.random() < p; }
+export function rotateAttr(angle, cx, cy) { return `rotate(${angle} ${cx} ${cy})`; }
 
 // Weighted-ish pick from many args — modelled as
 // uniform random pick (close enough for our visual purposes).
-const colorOf = (palette, i) => palette[i] || palette[palette.length - 1];
+export const colorOf = (palette, i) => palette[i] || palette[palette.length - 1];
 
 // Alias to the global uid() in core.js.
-const tileId = uid;
+export const tileId = uid;
 
 // ── Clip-path families (corner circles, center square/diamond, …) ──
 // All return a path-string suitable for use inside <clipPath>.
-function pathRect(x, y, w, h) {
+export function pathRect(x, y, w, h) {
   return `M${x} ${y}h${w}v${h}h${-w}z`;
 }
-function pathCircleAt(cx, cy, r) {
+export function pathCircleAt(cx, cy, r) {
   // Quarter-then-quarter half-arcs for a full circle.
   return `M${cx-r} ${cy} a${r} ${r} 0 1 0 ${2*r} 0 a${r} ${r} 0 1 0 ${-2*r} 0 z`;
 }
-function pathPolygon(points) {
+export function pathPolygon(points) {
   return 'M' + points.map(p => p.join(' ')).join('L') + 'Z';
 }
 // "circle(R% at X% Y%)" → an absolute circle clipping a cell.
-function clipCircleInCell(x, y, w, h, rPct, cxPct, cyPct) {
+export function clipCircleInCell(x, y, w, h, rPct, cxPct, cyPct) {
   const cx = x + w * cxPct, cy = y + h * cyPct;
   // rPct is a percentage of the cell side; we approximate
   // with width (cells are usually rectangular but the ratio doesn't blow up).
@@ -68,7 +69,7 @@ function clipCircleInCell(x, y, w, h, rPct, cxPct, cyPct) {
 // Parametric: x = (R - r)cosθ + r cos((R-r)/r · θ),
 //             y = (R - r)sinθ - r sin((R-r)/r · θ).
 // k cusps require R/r = k.
-function hypocycloidPath(cx, cy, R, k = 4, steps = 80) {
+export function hypocycloidPath(cx, cy, R, k = 4, steps = 80) {
   const r = R / k;
   let d = '';
   for (let i = 0; i <= steps; i++) {
@@ -81,7 +82,7 @@ function hypocycloidPath(cx, cy, R, k = 4, steps = 80) {
 }
 
 // Add a `<clipPath id=...><path d=.../></clipPath>` to defs, return id.
-function addClipPath(defs, d) {
+export function addClipPath(defs, d) {
   const id = tileId('clip');
   const cp = svgEl('clipPath', { id });
   cp.appendChild(svgEl('path', { d }));
@@ -90,7 +91,7 @@ function addClipPath(defs, d) {
 }
 
 // Make a soft drop-shadow filter; returns id.
-function addDropShadow(defs, stdDev = 8, opacity = 0.2) {
+export function addDropShadow(defs, stdDev = 8, opacity = 0.2) {
   const id = tileId('shadow');
   const f = svgEl('filter', { id, x:'-20%', y:'-20%', width:'140%', height:'140%' });
   f.appendChild(svgEl('feGaussianBlur', { in:'SourceAlpha', stdDeviation: stdDev }));
@@ -108,14 +109,14 @@ function addDropShadow(defs, stdDev = 8, opacity = 0.2) {
 
 // ── Shared palette colour resolver ─────────────────────────────
 // Pull color0..colorN out of state. State stores them as colorN keys.
-function paletteFrom(s, n) {
+export function paletteFrom(s, n) {
   const arr = [];
   for (let i = 0; i < n; i++) arr.push(s['color' + i] || '#fff');
   return arr;
 }
 
 // Every tile preset render shares this set-up.
-function setupTile(svg, W, H, s) {
+export function setupTile(svg, W, H, s) {
   const defs = svgEl('defs');
   svg.appendChild(defs);
   const pal = paletteFrom(s, 6);
@@ -124,7 +125,7 @@ function setupTile(svg, W, H, s) {
 
 // ── Tile preset registration helper ───────────────────────────
 // Builds standard controls from palette + extras and pushes to TOOLS.
-function registerTilePreset(preset) {
+export function registerTilePreset(preset) {
   const controls = preset.palette.map((col, i) => ({
     type:'color', id:'color'+i, label:'Color '+i, default: col
   }));

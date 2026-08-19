@@ -1,4 +1,7 @@
 // ── 16. rrrainbow — uniform rainbow circles via Voronoi ────────
+import { rnd, clamp, svgEl } from '../core.js';
+import { buildUniformVoronoi } from './_voronoi.js';
+
 function renderPrism(svg, W, H, s) {
   svg.appendChild(svgEl('rect', {x:0,y:0,width:W,height:H,fill:s.bgColor}));
 
@@ -33,7 +36,7 @@ function renderPrism(svg, W, H, s) {
   });
 }
 
-TOOLS.push({
+export default {
   cat: 'Weave', slug: 'prism', name: 'Prism', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 L17 16 L3 16 Z"/><path d="M10 8 L10 14"/></svg>',
   desc: 'Uniform rainbow circles, no overlap',
   render: renderPrism,
@@ -50,4 +53,4 @@ TOOLS.push({
     { type:'range',    id:'minFill',    label:'Min fill',    default:0.4, min:0.1, max:1.0,  step:0.05 },
     { type:'range',    id:'maxFill',    label:'Max fill',    default:0.92,min:0.3, max:1.0,  step:0.05 },
   ]
-});
+}

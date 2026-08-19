@@ -1,4 +1,6 @@
 // ── 3. bbblurry — blurry blob shapes ──────────────────────
+import { rnd, uid, svgEl } from '../core.js';
+
 function renderHaze(svg, W, H, s) {
   s.colors = [s.c0, s.c1, s.c2];
 
@@ -33,7 +35,7 @@ function renderHaze(svg, W, H, s) {
   });
 }
 
-TOOLS.push({
+export default {
   cat: 'Field', slug: 'haze', name: 'Haze', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="11" r="4" opacity="0.6"/><circle cx="13" cy="9" r="4" opacity="0.6"/><circle cx="10" cy="14" r="3" opacity="0.6"/></svg>',
   desc: 'Blurry gradient blob shapes',
   render: renderHaze,
@@ -47,4 +49,4 @@ TOOLS.push({
     { type:'range',  id:'sizeY',      label:'Height',     default:350, min:80, max:600, step:10 },
     { type:'range',  id:'opacity',    label:'Opacity',    default:1,   min:0.1,max:1,   step:0.05 },
   ]
-});
+}

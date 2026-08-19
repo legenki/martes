@@ -5,6 +5,8 @@
 //   frequency concentric scaled copies centered on canvas
 //   Linear gradient fill
 //
+import { rnd, rndInt, uid, svgEl } from '../core.js';
+
 function renderBloom(svg, W, H, s) {
   const bgColor   = s.bgColor    || 'none';
   const freq      = s.frequency  ?? 22;
@@ -85,7 +87,7 @@ function renderBloom(svg, W, H, s) {
   }
 }
 
-TOOLS.push({
+export default {
   cat: 'Form', slug: 'bloom', name: 'Bloom', icon: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 Q14 7 10 10 Q6 7 10 3 Z"/><path d="M17 10 Q13 14 10 10 Q13 6 17 10 Z"/><path d="M10 17 Q6 13 10 10 Q14 13 10 17 Z"/><path d="M3 10 Q7 6 10 10 Q7 14 3 10 Z"/></svg>',
   desc: 'Catmull-Rom concentric blobs',
   render: renderBloom,
@@ -101,4 +103,4 @@ TOOLS.push({
     { type:'range',    id:'strokeWidth',   label:'Stroke',      default:2,   min:1,   max:11,   step:0.5 },
     { type:'range',    id:'opacity',       label:'Opacity',     default:1,   min:0.1, max:1,    step:0.05 },
   ]
-});
+}
