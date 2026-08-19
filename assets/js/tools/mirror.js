@@ -1,14 +1,17 @@
 // ── 20. rrreflection — 4-group concentric circles from edges ──
-import { svgEl } from '../core.js';
+import { svgEl, uid } from '../core.js';
 
 function renderMirror(svg, W, H, s) {
   const defs = svgEl('defs');
+  // Per-render prefix — fixed ids collided with a previous render still in the
+  // document, so url(#ref-g0) resolved to the stale gradient.
+  const gid = uid('ref-g');
   // 4 gradients — top, bottom, left, right groups
   const configs = [
-    { id:'ref-g0', cx: W/2, cy: 0,   x1:'0%',y1:'0%',   x2:'0%',y2:'100%', flip:false },
-    { id:'ref-g1', cx: W/2, cy: H,   x1:'0%',y1:'100%', x2:'0%',y2:'0%',   flip:true  },
-    { id:'ref-g2', cx: 0,   cy: H/2, x1:'0%',y1:'0%',   x2:'100%',y2:'0%', flip:false },
-    { id:'ref-g3', cx: W,   cy: H/2, x1:'100%',y1:'0%', x2:'0%',y2:'0%',   flip:true  },
+    { id:`${gid}-0`, cx: W/2, cy: 0,   x1:'0%',y1:'0%',   x2:'0%',y2:'100%', flip:false },
+    { id:`${gid}-1`, cx: W/2, cy: H,   x1:'0%',y1:'100%', x2:'0%',y2:'0%',   flip:true  },
+    { id:`${gid}-2`, cx: 0,   cy: H/2, x1:'0%',y1:'0%',   x2:'100%',y2:'0%', flip:false },
+    { id:`${gid}-3`, cx: W,   cy: H/2, x1:'100%',y1:'0%', x2:'0%',y2:'0%',   flip:true  },
   ];
   configs.forEach(({id, flip}) => {
     const lg = svgEl('linearGradient', {id, x1:'0%',y1:'0%',x2:'0%',y2:'100%'});

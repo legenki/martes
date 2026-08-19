@@ -105,6 +105,11 @@ export function normalizeSvgPath(d, fillRule, targetW, targetH, centerX, centerY
 // ── High-quality Voronoi via grid-accelerated Lloyd relaxation ──
 // Grid resolution adapts to point count for uniform results at all amounts.
 export function buildUniformVoronoi(W, H, N, cx, cy, biasStrength) {
+  // Seed counts arrive straight from range controls, which can hand us a
+  // fractional or out-of-range value. Array.from({length:N}) floors N, so an
+  // un-normalised N leaves `pts` shorter than the `i < N` loops below expect
+  // and they read past the end. Normalise once, here, and use N everywhere.
+  N = Math.max(1, Math.floor(Number(N) || 1));
   // Step 1: seed with random-bias toward focus point
   function seedPt() {
     const rx = Math.random(), ry = Math.random();

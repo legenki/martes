@@ -1,4 +1,4 @@
-import { uid } from '../core.js';
+import { uid, svgEl } from '../core.js';
 // ═══════════════════════════════════════════════════════════════
 // TILE — shared helpers for grid presets (clip-paths, filters, palette)
 // Used by all tools/tile/*.js preset files.

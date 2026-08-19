@@ -91,10 +91,15 @@ export function clearSVG() {
   svg.replaceChildren();
 }
 
-export function renderTool() { window.myLogs = window.myLogs || []; window.myLogs.push("renderTool called with: " + (currentTool ? currentTool.slug : "null"));
+export function renderTool() {
   if (!currentTool) return;
   clearSVG();
-  try { currentTool.render(svg, canvasW, canvasH, getState()); } catch(e) { window.myLogs = window.myLogs || []; window.myLogs.push("ERR: " + e.stack); }
+  try {
+    currentTool.render(svg, canvasW, canvasH, getState());
+  } catch (e) {
+    // Surface generator failures instead of leaving a blank canvas.
+    console.error(`[martes] "${currentTool.slug}" failed to render:`, e);
+  }
 }
 
 export function getState() {

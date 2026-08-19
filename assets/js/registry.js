@@ -1,6 +1,5 @@
 import { BB_SHAPES } from './tools/burst.js';
 import { MM_SHAPES } from './tools/tessera.js';
-document.title = "REGISTRY RUNNING";
 import { setCurrentTool, rndInt, pick, map, RATIOS, canvasW, canvasH, currentTool, toolState, svg, resizeCanvas, renderTool, getState } from './core.js';
 import { pushUndo } from './history.js';
 import { currentPalette, currentPaletteIndex, applyPaletteToTool, applyPaletteGlobal } from './palettes.js';
@@ -137,7 +136,7 @@ function buildSidebar() {
 // ═══════════════════════════════════════════════════════════════
 // SELECT TOOL
 // ═══════════════════════════════════════════════════════════════
-function selectTool(tool) { window.myLogs = window.myLogs || []; window.myLogs.push("selectTool: " + tool.slug);
+function selectTool(tool) {
   setCurrentTool(tool);
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.toggle('active', b.dataset.slug === tool.slug));
   document.getElementById('btnRandomize').disabled = false;
@@ -741,5 +740,4 @@ function martesInit() { document.title="INIT START"; try {
 
 // Initialize everything
 martesInit();
-console.log('REGISTRY LOADED');
 window.DEBUG_TOOLS = TOOLS;

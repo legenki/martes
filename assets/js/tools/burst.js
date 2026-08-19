@@ -4,7 +4,7 @@
 // ── Shape library ─────────────────────────────────────────────
 // All paths centered at origin (0,0), fitting in ~±72 units radius.
 // fill:true = filled, fill:false = stroke-only
-import { rnd, clamp, lerp, map, svgEl } from '../core.js';
+import { rnd, clamp, lerp, map, svgEl, uid } from '../core.js';
 import { parseSvgShapeInput, normalizeSvgPath, buildUniformVoronoi } from './_voronoi.js';
 
 export const BB_SHAPES = [
@@ -54,7 +54,9 @@ function renderBurst(svg, W, H, s) {
   if (activeShapes.length === 0) return;
 
   // ── blur filters ─────────────────────────────────────
-  const blurIds = ['bbb0','bbb1','bbb2','bbb3'];
+  // Per-render ids — fixed ones collided with a previous render's <defs>
+  // still in the document, so url(#bbb0) resolved to the stale filter.
+  const blurIds = [0,1,2,3].map(n => uid('bbb') + '-' + n);
   let markup = `<defs>`;
   [0, 0.8, 2.5, 7].forEach((sd, i) => {
     markup += `<filter id="${blurIds[i]}" x="-40%" y="-40%" width="180%" height="180%">`;

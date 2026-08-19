@@ -29,7 +29,7 @@ function renderPrism(svg, W, H, s) {
     markup += `<circle cx="${cell.cx.toFixed(1)}" cy="${cell.cy.toFixed(1)}" r="${r.toFixed(1)}" fill="${isOutline ? 'none' : color}" stroke="${isOutline ? color : 'none'}" stroke-width="${isOutline ? (r * 0.12).toFixed(1) : 0}" opacity="${opacity}" />`;
   });
 
-  window.myLogs = window.myLogs || []; window.myLogs.push("markup length: " + markup.length); svg.innerHTML = markup; window.myLogs = window.myLogs || []; window.myLogs.push("prism markup: " + markup);
+  svg.innerHTML = markup;
 }
 
 export default {

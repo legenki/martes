@@ -1,11 +1,13 @@
 {
-  "name": "martes", 
+  "name": "martes",
   "version": "1.0.0",
-  "description": "Local design canvas — 34 SVG generators and a 360-texture browser, served from a single Node process.",
+  "description": "Local design canvas \u2014 34 SVG generators and a 360-texture browser, served from a single Node process.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "engines": {
     "node": ">=16"
@@ -29,5 +31,9 @@
     "textures"
   ],
   "license": "MIT",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "jsdom": "^30.0.1",
+    "vitest": "^4.1.11"
+  }
 }

@@ -2,7 +2,7 @@
 // All 15 original shapes in 40×40 tile space.
 // Each shape uses base/light/dark color roles.
 // Custom shapes also supported (single-color path).
-import { pick, clamp, svgEl, rgbToHex } from '../core.js';
+import { pick, clamp, svgEl, rgbToHex, uid } from '../core.js';
 
 export const MM_SHAPES = [
   { id:1,  label:'Cube',         markup: (b,l,d) => `<rect width="18" height="18" transform="matrix(0.866025 0.5 -0.866025 0.5 20 2)" fill="${b}"/><rect width="18" height="18" transform="matrix(0.866025 0.5 -2.20305e-08 1 4.41162 11)" fill="${l}"/><rect width="18" height="18" transform="matrix(0.866025 -0.5 2.20305e-08 1 20 20)" fill="${d}"/>` },
@@ -73,10 +73,13 @@ function renderTessera(svg, W, H, s) {
 
 
 
+  // Per-render prefix — fixed symbol ids collided with an earlier render's
+  // <defs> still in the document, so <use href="#mm-sh-0"> hit the stale symbol.
+  const shapeId = uid('mm-sh');
   // Create defs with one symbol per active shape
   markup += `<defs>`;
   activeShapes.forEach((sh, i) => {
-    markup += `<symbol id="mm-sh-${i}" viewBox="0 0 40 40" overflow="visible">`;
+    markup += `<symbol id="${shapeId}-${i}" viewBox="0 0 40 40" overflow="visible">`;
     if (sh.isCustom) {
       markup += `<path d="${sh.d}" fill="${base}" opacity="0.9"/>`;
     } else {
@@ -114,7 +117,7 @@ function renderTessera(svg, W, H, s) {
       const y = startY + row * tileH;
       const si = shapeIdx % activeShapes.length;
 
-      markup += `<use href="#mm-sh-${si}" x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${tileW}" height="${tileH}" />`;
+      markup += `<use href="#${shapeId}-${si}" x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${tileW}" height="${tileH}" />`;
     }
   }
   markup += `</g>`;

@@ -3,7 +3,7 @@
 // Voronoi tessellation places leaves; noise grid drives rotation/scale/opacity.
 // fillType: 'solid' | 'mixture' | 'stroke'
 // Blur tiers: scaleValue<0.2→stdDev12, <0.3→4, <0.4→2
-import { map, svgEl } from '../core.js';
+import { map, svgEl, uid } from '../core.js';
 import { buildUniformVoronoi } from './_voronoi.js';
 
 const LL_LEAF_D = 'M0 0h50c28 0 50 22 50 50H50C22 50 0 28 0 0Z';
@@ -22,10 +22,13 @@ function renderLeaf(svg, W, H, s) {
   let markup = `<rect x="0" y="0" width="${W}" height="${H}" fill="${s.bgColor}"/>`;
   
   // Blur filters
+  // Per-render id prefix — hardcoded ids collided when an earlier render's
+  // <defs> was still in the document, silently re-pointing url(#…) references.
+  const blurId = uid('ll-blur');
   markup += `<defs>`;
   if (doBlur) {
     [[2,2],[3,4],[4,12]].forEach(([id, sd]) => {
-      markup += `<filter id="ll-blur-${id}" x="-100%" y="-100%" width="400%" height="400%">`;
+      markup += `<filter id="${blurId}-${id}" x="-100%" y="-100%" width="400%" height="400%">`;
       markup += `<feGaussianBlur in="SourceGraphic" stdDeviation="${sd}"/>`;
       markup += `</filter>`;
     });
@@ -69,9 +72,9 @@ function renderLeaf(svg, W, H, s) {
 
     let filterAttr = '';
     if (doBlur) {
-      if      (scaleVal < 0.2) filterAttr = 'filter="url(#ll-blur-4)"';
-      else if (scaleVal < 0.3) filterAttr = 'filter="url(#ll-blur-3)"';
-      else if (scaleVal < 0.4) filterAttr = 'filter="url(#ll-blur-2)"';
+      if      (scaleVal < 0.2) filterAttr = `filter="url(#${blurId}-4)"`;
+      else if (scaleVal < 0.3) filterAttr = `filter="url(#${blurId}-3)"`;
+      else if (scaleVal < 0.4) filterAttr = `filter="url(#${blurId}-2)"`;
     }
     
     const opacAttr = doOpacity ? `opacity="${opacityVal.toFixed(2)}"` : '';
