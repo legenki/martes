@@ -9,7 +9,7 @@ import { buildUniformVoronoi } from './_voronoi.js';
 const LL_LEAF_D = 'M0 0h50c28 0 50 22 50 50H50C22 50 0 28 0 0Z';
 
 function renderLeaf(svg, W, H, s) {
-  svg.appendChild(svgEl('rect', {x:0,y:0,width:W,height:H,fill:s.bgColor}));
+
 
   const color     = s.color       || 'hsl(305,77%,40%)';
   const fillType  = s.fillType    || 'mixture';
@@ -19,22 +19,21 @@ function renderLeaf(svg, W, H, s) {
   const doBlur    = s.blur        ?? true;
   const doOpacity = s.modOpacity  ?? true;
 
+  let markup = `<rect x="0" y="0" width="${W}" height="${H}" fill="${s.bgColor}"/>`;
+  
   // Blur filters
-  const defs = svgEl('defs');
+  markup += `<defs>`;
   if (doBlur) {
     [[2,2],[3,4],[4,12]].forEach(([id, sd]) => {
-      const f = svgEl('filter', {id:`ll-blur-${id}`, x:'-100%',y:'-100%',width:'400%',height:'400%'});
-      f.appendChild(svgEl('feGaussianBlur', {in:'SourceGraphic', stdDeviation:String(sd)}));
-      defs.appendChild(f);
+      markup += `<filter id="ll-blur-${id}" x="-100%" y="-100%" width="400%" height="400%">`;
+      markup += `<feGaussianBlur in="SourceGraphic" stdDeviation="${sd}"/>`;
+      markup += `</filter>`;
     });
   }
-  svg.appendChild(defs);
-
-  // Groups
-  const gFill   = svgEl('g', {fill:color});
-  const gStroke = svgEl('g', {fill:'none', stroke:color, 'stroke-width':'3'});
-  if (fillType !== 'stroke') svg.appendChild(gFill);
-  if (fillType !== 'solid')  svg.appendChild(gStroke);
+  markup += `</defs>`;
+  
+  let fillMarkup = '';
+  let strokeMarkup = '';
 
   // Lightweight Voronoi via Lloyd relaxation (uniform point distribution)
   const cells = buildUniformVoronoi(W, H, freq, W/2, H/2, 0);
@@ -61,33 +60,32 @@ function renderLeaf(svg, W, H, s) {
     const opacityVal= map(nv, -1, 1, 0.15, 1);
 
     // Pick group
-    let g;
-    if (fillType === 'solid')   g = gFill;
-    else if (fillType === 'stroke') g = gStroke;
-    else g = (Math.random() > 0.55) ? gStroke : gFill;
+    const isStroke = (fillType === 'stroke') || (fillType === 'mixture' && Math.random() > 0.55);
 
-    // The leaf path is 100×100 with origin at (0,0).
-    // SVG.js .size(n).cx(cx).cy(cy) = scale to n×n then center.
-    // We replicate: translate to cx,cy then rotate then scale.
-    // Scaled size = 100 * scaleVal; center offset = 50 * scaleVal
     const size = 100 * scaleVal;
     const half = size / 2;
     const tx = cx - half;
     const ty = cy - half;
 
-    const attrs = {
-      d: LL_LEAF_D,
-      transform: `rotate(${rotation} ${cx} ${cy}) translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${scaleVal.toFixed(4)})`
-    };
-    if (doOpacity) attrs.opacity = opacityVal.toFixed(2);
+    let filterAttr = '';
     if (doBlur) {
-      if      (scaleVal < 0.2) attrs.filter = 'url(#ll-blur-4)';
-      else if (scaleVal < 0.3) attrs.filter = 'url(#ll-blur-3)';
-      else if (scaleVal < 0.4) attrs.filter = 'url(#ll-blur-2)';
+      if      (scaleVal < 0.2) filterAttr = 'filter="url(#ll-blur-4)"';
+      else if (scaleVal < 0.3) filterAttr = 'filter="url(#ll-blur-3)"';
+      else if (scaleVal < 0.4) filterAttr = 'filter="url(#ll-blur-2)"';
     }
+    
+    const opacAttr = doOpacity ? `opacity="${opacityVal.toFixed(2)}"` : '';
+    const transform = `rotate(${rotation} ${cx} ${cy}) translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${scaleVal.toFixed(4)})`;
 
-    g.appendChild(svgEl('path', attrs));
+    const pathStr = `<path d="${LL_LEAF_D}" transform="${transform}" ${opacAttr} ${filterAttr} />`;
+    if (isStroke) strokeMarkup += pathStr;
+    else          fillMarkup += pathStr;
   });
+
+  if (fillType !== 'stroke') markup += `<g fill="${color}">${fillMarkup}</g>`;
+  if (fillType !== 'solid')  markup += `<g fill="none" stroke="${color}" stroke-width="3">${strokeMarkup}</g>`;
+  
+  svg.innerHTML = markup;
 }
 
 export default {

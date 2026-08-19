@@ -2,6 +2,7 @@
 import { rnd, uid, svgEl } from '../core.js';
 
 function renderDrift(svg, W, H, s) {
+  const { angle } = s;
   const defs = svgEl('defs');
   const gradId = uid('flurry-grad');
   const grad = svgEl('linearGradient', {id:gradId, x1:'0%', y1:'100%', x2:'0%', y2:'0%'});
@@ -15,7 +16,6 @@ function renderDrift(svg, W, H, s) {
   const bg = svgEl('rect', {x:0,y:0,width:W,height:H,fill:s.bgColor});
   svg.appendChild(bg);
 
-  const angle = s.angle;
   for (let i = 0; i < s.count; i++) {
     const w = rnd(s.multiplier * 10, s.multiplier * 35);
     const h = s.thickness;

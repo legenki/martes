@@ -38,7 +38,7 @@ function qtLeaves(node, out) {
 }
 
 function renderQuartz(svg, W, H, s) {
-  svg.appendChild(svgEl('rect', {x:0,y:0,width:W,height:H,fill:s.bgColor}));
+  let markup = `<rect x="0" y="0" width="${W}" height="${H}" fill="${s.bgColor}"/>`;
 
   // Build quadtree from random points
   const N     = s.density || 333;
@@ -54,8 +54,7 @@ function renderQuartz(svg, W, H, s) {
   const leaves = [];
   qtLeaves(root, leaves);
 
-  const g = svgEl('g', {'shape-rendering':'crispEdges'});
-  svg.appendChild(g);
+  markup += `<g shape-rendering="crispEdges">`;
 
   for (const leaf of leaves) {
     // Skip tiny cells
@@ -72,11 +71,13 @@ function renderQuartz(svg, W, H, s) {
     const pts = corners.map(p => p.join(',')).join(' ');
 
     if (s.filled) {
-      g.appendChild(svgEl('polygon', {points:pts, fill:s.color, stroke:'none'}));
+      markup += `<polygon points="${pts}" fill="${s.color}" stroke="none" />`;
     } else {
-      g.appendChild(svgEl('polygon', {points:pts, fill:'none', stroke:s.color, 'stroke-width':sw}));
+      markup += `<polygon points="${pts}" fill="none" stroke="${s.color}" stroke-width="${sw}" />`;
     }
   }
+  markup += `</g>`;
+  svg.innerHTML = markup;
 }
 
 export default {

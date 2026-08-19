@@ -54,27 +54,26 @@ function renderBurst(svg, W, H, s) {
   if (activeShapes.length === 0) return;
 
   // ── blur filters ─────────────────────────────────────
-  const defs = svgEl('defs');
   const blurIds = ['bbb0','bbb1','bbb2','bbb3'];
+  let markup = `<defs>`;
   [0, 0.8, 2.5, 7].forEach((sd, i) => {
-    const f = svgEl('filter', {id:blurIds[i], x:'-40%',y:'-40%',width:'180%',height:'180%'});
-    if (sd > 0) f.appendChild(svgEl('feGaussianBlur', {stdDeviation:sd}));
-    defs.appendChild(f);
+    markup += `<filter id="${blurIds[i]}" x="-40%" y="-40%" width="180%" height="180%">`;
+    if (sd > 0) markup += `<feGaussianBlur stdDeviation="${sd}"/>`;
+    markup += `</filter>`;
   });
-  svg.appendChild(defs);
-
-  svg.appendChild(svgEl('rect', {x:0, y:0, width:W, height:H, fill:s.bgColor}));
+  markup += `</defs>`;
+  markup += `<rect x="0" y="0" width="${W}" height="${H}" fill="${s.bgColor}"/>`;
 
   const palette = [s.color1, s.color2, s.color3, s.color4, s.color5].filter(Boolean);
   const ox = s.centerX * W, oy = s.centerY * H;
   const maxDist = Math.hypot(Math.max(ox, W - ox), Math.max(oy, H - oy));
 
   // Build uniform Voronoi — amount slider directly controls N
-  const cells = buildUniformVoronoi(W, H, s.amount, ox, oy, 1.4);
+  const cells = buildUniformVoronoi(W, H, s.amount, ox, oy, 1.4); window.DEBUG_CELLS = cells.length;
 
   // Deterministic per-cell color using index so adjacent cells differ
   cells.forEach((cell, idx) => {
-    if (cell.r < 1.5) return;
+    if (cell.r < 1.5) { window.DEBUG_SKIPPED = (window.DEBUG_SKIPPED || 0) + 1; return; }
 
     const dist = Math.hypot(cell.cx - ox, cell.cy - oy);
     const t = dist / maxDist; // 0=center → 1=edge
@@ -106,49 +105,36 @@ function renderBurst(svg, W, H, s) {
     const sc = baseR / shapeR;
 
     const rot = rnd(0, 360);
-    const gAttrs = {
-      transform: `translate(${cell.cx.toFixed(1)},${cell.cy.toFixed(1)}) rotate(${rot.toFixed(1)}) scale(${sc.toFixed(5)})`
-    };
-    if (blur) gAttrs.filter = blur;
-
-    const g = svgEl('g', gAttrs);
+    const filterAttr = blur ? `filter="${blur}"` : '';
+    markup += `<g transform="translate(${cell.cx.toFixed(1)},${cell.cy.toFixed(1)}) rotate(${rot.toFixed(1)}) scale(${sc.toFixed(5)})" ${filterAttr}>`;
 
     const useStroke = !shape.fill || (shape.isCustom && shape.isStroke);
 
     if (shape.isCustom && shape._normD) {
-      // Custom shape with normalized transform
-      const inner = svgEl('g', shape._normTransform ? {transform: shape._normTransform} : {});
-      const pathAttrs = { d: shape._normD, opacity };
+      const transformAttr = shape._normTransform ? `transform="${shape._normTransform}"` : '';
+      markup += `<g ${transformAttr}>`;
       if (useStroke) {
-        pathAttrs.fill = 'none';
-        pathAttrs.stroke = color;
-        pathAttrs['stroke-width'] = (s.strokeW / sc).toFixed(2);
-        pathAttrs['stroke-linecap'] = 'round';
-        pathAttrs['stroke-linejoin'] = 'round';
+        const sw = (s.strokeW / sc).toFixed(2);
+        const fr = (shape._fillRule && shape._fillRule !== 'nonzero') ? `fill-rule="${shape._fillRule}"` : '';
+        markup += `<path d="${shape._normD}" opacity="${opacity}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" ${fr} />`;
       } else {
-        pathAttrs.fill = color;
-        pathAttrs.stroke = 'none';
+        const fr = (shape._fillRule && shape._fillRule !== 'nonzero') ? `fill-rule="${shape._fillRule}"` : '';
+        markup += `<path d="${shape._normD}" opacity="${opacity}" fill="${color}" stroke="none" ${fr} />`;
       }
-      if (shape._fillRule && shape._fillRule !== 'nonzero') pathAttrs['fill-rule'] = shape._fillRule;
-      inner.appendChild(svgEl('path', pathAttrs));
-      g.appendChild(inner);
+      markup += `</g>`;
     } else {
-      const pathAttrs = { d: shape.d, opacity };
       if (useStroke) {
-        pathAttrs.fill = 'none';
-        pathAttrs.stroke = color;
-        pathAttrs['stroke-width'] = (s.strokeW / sc).toFixed(2);
-        pathAttrs['stroke-linecap'] = 'round';
-        pathAttrs['stroke-linejoin'] = 'round';
+        const sw = (s.strokeW / sc).toFixed(2);
+        markup += `<path d="${shape.d}" opacity="${opacity}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" />`;
       } else {
-        pathAttrs.fill = color;
-        pathAttrs.stroke = 'none';
+        markup += `<path d="${shape.d}" opacity="${opacity}" fill="${color}" stroke="none" />`;
       }
-      g.appendChild(svgEl('path', pathAttrs));
     }
+    markup += `</g>`;
 
-    svg.appendChild(g);
+
   });
+  window.DEBUG_MARKUP = markup.length; svg.innerHTML = markup;
 }
 
 export default {

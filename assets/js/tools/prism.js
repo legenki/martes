@@ -3,7 +3,7 @@ import { rnd, clamp, svgEl } from '../core.js';
 import { buildUniformVoronoi } from './_voronoi.js';
 
 function renderPrism(svg, W, H, s) {
-  svg.appendChild(svgEl('rect', {x:0,y:0,width:W,height:H,fill:s.bgColor}));
+  let markup = `<rect x="0" y="0" width="${W}" height="${H}" fill="${s.bgColor}"/>`;
 
   // Uniform placement: each circle in its own Voronoi cell
   const cells = buildUniformVoronoi(W, H, s.count, W/2, H/2, 0);
@@ -26,14 +26,10 @@ function renderPrism(svg, W, H, s) {
     // 'mixture': randomly solid or outline
     const isOutline = ft === 'outline' || (ft === 'mixture' && Math.random() > 0.5);
 
-    svg.appendChild(svgEl('circle', {
-      cx: cell.cx.toFixed(1), cy: cell.cy.toFixed(1), r: r.toFixed(1),
-      fill:           isOutline ? 'none' : color,
-      stroke:         isOutline ? color  : 'none',
-      'stroke-width': isOutline ? (r * 0.12).toFixed(1) : 0,
-      opacity
-    }));
+    markup += `<circle cx="${cell.cx.toFixed(1)}" cy="${cell.cy.toFixed(1)}" r="${r.toFixed(1)}" fill="${isOutline ? 'none' : color}" stroke="${isOutline ? color : 'none'}" stroke-width="${isOutline ? (r * 0.12).toFixed(1) : 0}" opacity="${opacity}" />`;
   });
+
+  window.myLogs = window.myLogs || []; window.myLogs.push("markup length: " + markup.length); svg.innerHTML = markup; window.myLogs = window.myLogs || []; window.myLogs.push("prism markup: " + markup);
 }
 
 export default {

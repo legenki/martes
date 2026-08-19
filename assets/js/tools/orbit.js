@@ -34,6 +34,7 @@ function ggyrateMakeShapeEl(shape, size, cx, cy) {
 }
 
 function renderOrbit(svg, W, H, s) {
+  const { shape } = s;
   // background
   svg.appendChild(svgEl('rect', { x:0, y:0, width:W, height:H, fill: s.bgColor }));
 
@@ -42,7 +43,6 @@ function renderOrbit(svg, W, H, s) {
   const scale = s.scaleConstant;
   const rot   = s.rotationConstant;
   const sw    = s.baseStrokeWidth;
-  const shape = s.shape;
 
   // Gradient defs (vertical, userSpaceOnUse, top→bottom, like original)
   const defs = svgEl('defs');

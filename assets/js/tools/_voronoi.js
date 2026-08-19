@@ -1,3 +1,4 @@
+import { clamp, lerp } from '../core.js';
 // ═══════════════════════════════════════════════════════════════
 // SHARED — Voronoi engine + SVG shape parsing utilities
 // Used by: burst.js, leaf.js, prism.js

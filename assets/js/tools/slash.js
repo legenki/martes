@@ -2,13 +2,12 @@
 import { rnd, map, svgEl } from '../core.js';
 
 function renderSlash(svg, W, H, s) {
-  const blockSize = s.blockSize;
-  const strokeWidth = s.strokeWidth;
-  const probability = s.probability;
-  const color = s.color;
-  const lineCap = s.lineCap;
-  const opacityMode = s.opacityMode;
-  const opacity = s.opacity;
+  const { blockSize, strokeWidth, probability, color, lineCap, opacityMode, opacity } = s;
+
+
+
+
+
   const cols = Math.ceil(W / blockSize) + 1;
   const rows = Math.ceil(H / blockSize) + 1;
 

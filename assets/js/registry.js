@@ -134,7 +134,7 @@ function buildSidebar() {
 // ═══════════════════════════════════════════════════════════════
 // SELECT TOOL
 // ═══════════════════════════════════════════════════════════════
-function selectTool(tool) {
+function selectTool(tool) { window.myLogs = window.myLogs || []; window.myLogs.push("selectTool: " + tool.slug);
   setCurrentTool(tool);
   document.querySelectorAll('.tool-btn').forEach(b => b.classList.toggle('active', b.dataset.slug === tool.slug));
   document.getElementById('btnRandomize').disabled = false;
@@ -727,3 +727,4 @@ function martesInit() { document.title="INIT START"; try {
 // Initialize everything
 martesInit();
 console.log('REGISTRY LOADED');
+window.DEBUG_TOOLS = TOOLS;

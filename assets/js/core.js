@@ -91,10 +91,10 @@ export function clearSVG() {
   svg.replaceChildren();
 }
 
-export function renderTool() {
+export function renderTool() { window.myLogs = window.myLogs || []; window.myLogs.push("renderTool called with: " + (currentTool ? currentTool.slug : "null"));
   if (!currentTool) return;
   clearSVG();
-  currentTool.render(svg, canvasW, canvasH, getState());
+  try { currentTool.render(svg, canvasW, canvasH, getState()); } catch(e) { window.myLogs = window.myLogs || []; window.myLogs.push("ERR: " + e.stack); }
 }
 
 export function getState() {

@@ -2,6 +2,7 @@
 import { uid, svgEl, lerpColor } from '../core.js';
 
 function renderHalo(svg, W, H, s) {
+  const { rings } = s;
   const defs = svgEl('defs');
   svg.appendChild(defs);
 
@@ -10,7 +11,6 @@ function renderHalo(svg, W, H, s) {
 
   const cx = W/2, cy = H/2;
   const maxR = Math.sqrt(cx*cx + cy*cy) * 1.1;
-  const rings = s.rings;
 
   for (let i = rings; i >= 1; i--) {
     const t = i / rings;

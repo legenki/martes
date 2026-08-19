@@ -42,6 +42,7 @@ function mmAdjustColor(color, amount) {
 }
 
 function renderTessera(svg, W, H, s) {
+  const { angle, skewX, skewY, opacity } = s;
   if (!Array.isArray(s.mmActiveShapes)) s.mmActiveShapes = [1];
 
   const activeIds = Array.isArray(s.mmActiveShapes) && s.mmActiveShapes.length > 0
@@ -61,35 +62,29 @@ function renderTessera(svg, W, H, s) {
   // Strategy: use one <pattern> per shape, pick which to show per tile via JS grid render.
   // Since SVG pattern can't randomize, we render a grid of groups manually instead.
 
-  svg.appendChild(svgEl('rect', {x:0, y:0, width:W, height:H, fill:s.bgColor}));
-
+  let markup = `<rect x="0" y="0" width="${W}" height="${H}" fill="${s.bgColor}"/>`;
   const TILE = 40; // original tile space
   const sc = s.scale; // scale factor (tile becomes TILE*sc px)
   const tileW = TILE * sc;
   const tileH = TILE * sc;
 
-  const angle   = s.angle;
   const tx      = s.translateX;
   const ty      = s.translateY;
-  const skewX   = s.skewX;
-  const skewY   = s.skewY;
-  const opacity = s.opacity;
+
+
 
   // Create defs with one symbol per active shape
-  const defs = svgEl('defs');
+  markup += `<defs>`;
   activeShapes.forEach((sh, i) => {
-    const sym = svgEl('symbol', {id:`mm-sh-${i}`, viewBox:'0 0 40 40', overflow:'visible'});
-    // inject markup as innerHTML via temporary container
-    const tmp = document.createElementNS('http://www.w3.org/2000/svg','g');
+    markup += `<symbol id="mm-sh-${i}" viewBox="0 0 40 40" overflow="visible">`;
     if (sh.isCustom) {
-      tmp.innerHTML = `<path d="${sh.d}" fill="${base}" opacity="0.9"/>`;
+      markup += `<path d="${sh.d}" fill="${base}" opacity="0.9"/>`;
     } else {
-      tmp.innerHTML = sh.markup(base, light, dark);
+      markup += sh.markup(base, light, dark);
     }
-    while (tmp.firstChild) sym.appendChild(tmp.firstChild);
-    defs.appendChild(sym);
+    markup += `</symbol>`;
   });
-  svg.appendChild(defs);
+  markup += `</defs>`;
 
   // Build a padded grid that covers W×H after transform
   // We over-cover by large margin and apply transform on a group
@@ -108,8 +103,7 @@ function renderTessera(svg, W, H, s) {
   // Original patternTransform order: translate → scale → rotate → skewX → skewY
   // We rotate around canvas center, then apply skew
   const transform = `translate(${W/2 + tx},${H/2 + ty}) rotate(${angle}) skewX(${skewX}) skewY(${skewY}) translate(${-W/2},${-H/2})`;
-  const g = svgEl('g', {transform, opacity});
-  svg.appendChild(g);
+  markup += `<g transform="${transform}" opacity="${opacity}">`;
 
   let shapeIdx = 0;
   for (let row = 0; row < rows; row++) {
@@ -120,15 +114,11 @@ function renderTessera(svg, W, H, s) {
       const y = startY + row * tileH;
       const si = shapeIdx % activeShapes.length;
 
-      const use = svgEl('use');
-      use.setAttribute('href', `#mm-sh-${si}`);
-      use.setAttribute('x', x.toFixed(2));
-      use.setAttribute('y', y.toFixed(2));
-      use.setAttribute('width', tileW);
-      use.setAttribute('height', tileH);
-      g.appendChild(use);
+      markup += `<use href="#mm-sh-${si}" x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${tileW}" height="${tileH}" />`;
     }
   }
+  markup += `</g>`;
+  svg.innerHTML = markup;
 }
 
 export default {
