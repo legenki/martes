@@ -7,7 +7,7 @@
 import { rnd, clamp, lerp, map, svgEl } from '../core.js';
 import { parseSvgShapeInput, normalizeSvgPath, buildUniformVoronoi } from './_voronoi.js';
 
-const BB_SHAPES = [
+export const BB_SHAPES = [
   { id:'triangle',   label:'▲ Triangle',  fill:true,
     d:'M 0,-70 L 61,35 L -61,35 Z' },
   { id:'pentagon',   label:'⬠ Pentagon',  fill:true,

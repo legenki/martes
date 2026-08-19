@@ -4,7 +4,7 @@
 // Custom shapes also supported (single-color path).
 import { pick, clamp, svgEl, rgbToHex } from '../core.js';
 
-const MM_SHAPES = [
+export const MM_SHAPES = [
   { id:1,  label:'Cube',         markup: (b,l,d) => `<rect width="18" height="18" transform="matrix(0.866025 0.5 -0.866025 0.5 20 2)" fill="${b}"/><rect width="18" height="18" transform="matrix(0.866025 0.5 -2.20305e-08 1 4.41162 11)" fill="${l}"/><rect width="18" height="18" transform="matrix(0.866025 -0.5 2.20305e-08 1 20 20)" fill="${d}"/>` },
   { id:2,  label:'Plank',        markup: (b,l,d) => `<rect width="64.4123" height="124.995" transform="matrix(0.24201 0.970274 0 1 4.41162 -64.7517)" fill="${b}"/><rect width="64.4123" height="124.995" transform="matrix(0.24201 -0.970274 0 1 19.9995 -2.25317)" fill="${d}"/>` },
   { id:3,  label:'Cylinder A',   markup: (b,l,d) => `<circle r="7.34831" transform="matrix(0.866044 -0.499967 0.866044 0.499967 20.0004 23.5002)" fill="${d}"/><circle r="7.34831" transform="matrix(0.866044 -0.499967 0.866044 0.499967 20.0004 20.5002)" fill="${l}"/><circle r="7.34831" transform="matrix(0.866044 -0.499967 0.866044 0.499967 19.9999 16.4998)" fill="${b}"/>` },

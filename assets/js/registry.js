@@ -1,3 +1,5 @@
+import { BB_SHAPES } from './tools/burst.js';
+import { MM_SHAPES } from './tools/tessera.js';
 document.title = "REGISTRY RUNNING";
 import { setCurrentTool, rndInt, pick, map, RATIOS, canvasW, canvasH, currentTool, toolState, svg, resizeCanvas, renderTool, getState } from './core.js';
 import { pushUndo } from './history.js';
