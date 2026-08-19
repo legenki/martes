@@ -351,7 +351,7 @@ function buildCtrl(c, s) {
     return `<div class="ctrl-row">
       <div class="ctrl-label-row">
         <span class="ctrl-label">${c.label}</span>
-        <span class="ctrl-val" id="val-${c.id}">${typeof val === 'number' ? (val % 1 === 0 ? val : parseFloat(val.toFixed(3))) : val}</span>
+        <input type="number" class="ctrl-num-input" id="num-${c.id}" data-ctrl-num="${c.id}" value="${typeof val === 'number' ? (val % 1 === 0 ? val : parseFloat(val.toFixed(3))) : val}" step="${c.step}">
       </div>
       <input type="range" data-ctrl="${c.id}" min="${c.min}" max="${c.max}" step="${c.step}" value="${val}">
     </div>`;
@@ -537,14 +537,12 @@ function bindPanelEvents(tool, s) {
         scheduleRender();
       });
     } else if (el.type === 'range') {
-      // Snapshot BEFORE drag so undo returns to pre-drag state.
-      // pointerdown fires once at drag start; `change` fires at end (no value diff).
       el.addEventListener('pointerdown', () => { pushUndo(); });
       el.addEventListener('input', () => {
         const v = parseFloat(el.value);
         s[id] = v;
-        const ve = document.getElementById('val-' + id);
-        if (ve) ve.textContent = v % 1 === 0 ? v : parseFloat(v.toFixed(3));
+        const numInput = document.getElementById('num-' + id);
+        if (numInput) numInput.value = v % 1 === 0 ? v : parseFloat(v.toFixed(3));
         scheduleRender();
       });
       // Keyboard arrows on focused slider (no pointerdown) — capture once via change.
@@ -561,6 +559,20 @@ function bindPanelEvents(tool, s) {
         scheduleRender();
       });
     }
+  });
+
+  
+  scope.querySelectorAll('.ctrl-num-input').forEach(el => {
+    const id = el.dataset.ctrlNum;
+    el.addEventListener('focus', () => { pushUndo(); });
+    el.addEventListener('input', () => {
+      const v = parseFloat(el.value);
+      if (isNaN(v)) return;
+      s[id] = v;
+      const slider = document.querySelector(`input[type="range"][data-ctrl="${id}"]`);
+      if (slider) slider.value = v;
+      scheduleRender();
+    });
   });
 
   // ── bbburst multi-shape picker ─────────────────────────────
