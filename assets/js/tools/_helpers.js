@@ -155,7 +155,7 @@ export function registerTilePreset(preset) {
   if (preset.extras.includes('roundedCorners')) {
     controls.push({ type:'toggle', id:'roundedCorners', label:'Rounded corners', default: preset.defaults.roundedCorners });
   }
-  TOOLS.push({
+  return {
     cat:'Tile',
     slug: preset.slug,
     name: preset.name,
@@ -163,5 +163,5 @@ export function registerTilePreset(preset) {
     desc: preset.desc || ('Tile preset — ' + preset.name),
     render: preset.render,
     controls
-  });
+  };
 }

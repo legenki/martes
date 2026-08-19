@@ -1,5 +1,6 @@
 document.title = "REGISTRY RUNNING";
 import { setCurrentTool, rndInt, pick, map, RATIOS, canvasW, canvasH, currentTool, toolState, svg, resizeCanvas, renderTool, getState } from './core.js';
+import { pushUndo } from './history.js';
 import { currentPalette, currentPaletteIndex, applyPaletteToTool, applyPaletteGlobal } from './palettes.js';
 import splat from './tools/splat.js';
 import dust from './tools/dust.js';

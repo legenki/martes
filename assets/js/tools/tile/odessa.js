@@ -33,9 +33,10 @@ function renderTileOdessa(svg, W, H, s) {
   });
 }
 
-export default {
+export default registerTilePreset({
   slug:'tile-odessa', name:'Odessa', icon:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="3" height="14" rx="1.5"/><rect x="8.5" y="6" width="3" height="11" rx="1.5"/><rect x="13" y="3" width="3" height="10" rx="1.5"/></svg>', render:renderTileOdessa,
   palette:['#FFFFFF','#3FFFB2','#D89FFF','#D89FFF','#FF3D8B','#FFFFFF'],
   defaults:{ grid:'4x6', frequency:0.4, shadow:false },
   extras:['grid','frequency','shadow']
-}
+
+});

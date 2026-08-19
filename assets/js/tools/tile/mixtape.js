@@ -51,9 +51,10 @@ function renderTileMixtape(svg, W, H, s) {
   });
 }
 
-export default {
+export default registerTilePreset({
   slug:'tile-mixtape', name:'Mixtape', icon:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14"/><path d="M3 10 L17 10"/><path d="M3 3 L10 10 L3 17" fill="currentColor" opacity="0.25"/><path d="M17 3 A7 7 0 0 1 10 10"/></svg>', render:renderTileMixtape,
   palette:['#FFFFFF','#232529','#3E8BFF','#3FFFB2','#3EECFF','#3FFFB2'],
   defaults:{ grid:'4x6', frequency:1, shadow:false },
   extras:['grid','frequency','shadow']
-}
+
+});

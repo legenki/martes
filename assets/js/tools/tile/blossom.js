@@ -65,9 +65,10 @@ function renderTileBlossom(svg, W, H, s) {
   });
 }
 
-export default {
+export default registerTilePreset({
   slug:'tile-blossom', name:'Blossom', icon:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17 L10 10 A5 5 0 0 0 10 17 Z M10 10 A5 5 0 0 1 10 17" fill="currentColor" opacity="0.15"/><path d="M3 17 L3 10 A7 7 0 0 1 17 10 L17 17 Z"/><path d="M5 3 Q10 8 5 8 Q10 8 5 3 M15 3 Q10 8 15 8 Q10 8 15 3" transform="translate(0 -2)"/></svg>', render:renderTileBlossom,
   palette:['#FFFFFF','#3EECFF','#FFA1C6','#3FFFB2','#ECFF3D','#FF3D8B'],
   defaults:{ grid:'2x3', frequency:1 },
   extras:['grid','frequency']
-}
+
+});

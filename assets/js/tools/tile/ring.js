@@ -29,9 +29,10 @@ function renderTileRing(svg, W, H, s) {
   });
 }
 
-export default {
+export default registerTilePreset({
   slug:'tile-ring', name:'Ring', icon:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="10" r="5"/><circle cx="12" cy="10" r="5" opacity="0.5"/></svg>', render:renderTileRing,
   palette:['#9EFFD8','#FFFFFF','#9EFFD8','#232529','#9EFFD8','#9EFFD8'],
   defaults:{ grid:'2x3', frequency:1 },
   extras:['grid','frequency']
-}
+
+});

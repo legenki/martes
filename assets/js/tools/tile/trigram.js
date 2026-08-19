@@ -37,9 +37,10 @@ function renderTileTrigram(svg, W, H, s) {
   });
 }
 
-export default {
+export default registerTilePreset({
   slug:'tile-trigram', name:'Trigram', icon:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="14" height="2" rx="1"/><rect x="3" y="9" width="14" height="2" rx="1"/><rect x="3" y="13" width="14" height="2" rx="1"/></svg>', render:renderTileTrigram,
   palette:['#FFFFFF','#3E8BFF','#FF3D8B','#3FFF50','#F5DD32','#FFFFFF'],
   defaults:{ grid:'4x6', frequency:1, roundedCorners:true },
   extras:['grid','frequency','roundedCorners']
-}
+
+});

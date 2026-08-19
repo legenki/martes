@@ -838,19 +838,26 @@ input[type="range"]::-webkit-slider-thumb:hover {
 /* ── RESPONSIVE: < 768px — panel below canvas ────────────────── */
 @media (max-width: 768px) {
   .studio-layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr auto;
+    display: flex;
+    flex-direction: column;
   }
 
   .studio-canvas {
+    position: relative;
+    flex: 1;
     min-height: 50vh;
   }
 
   .studio-panel {
+    position: relative;
+    top: auto; right: auto; bottom: auto; left: auto;
+    width: 100%;
     border-left: none;
+    border-radius: 0;
     border-top: 1px solid var(--border);
     max-height: 40vh;
     overflow-y: auto;
+    box-shadow: none;
   }
 
   /* Textures — single column on narrow screens */
