@@ -31,61 +31,90 @@ const VENDOR = '../vendor/paper-shaders/index.js';
 export const SHADERS = [
   { id:'none', name:'None', shader:null, kind:null, uniforms:{} },
 
-  // ── pattern family (v_patternUV, fit: none) ──────────────────
-  { id:'dotGrid', name:'Dot Grid', shader:'dotGridFragmentShader', kind:'pattern',
-    uniforms:{ u_dotSize:0.32, u_gapX:0.4, u_gapY:0.4, u_strokeWidth:0,
-               u_sizeRange:0.3, u_opacityRange:0.4, u_shape:0 } },
-  { id:'dotOrbit', name:'Dot Orbit', shader:'dotOrbitFragmentShader', kind:'pattern',
-    uniforms:{ u_stepsPerColor:2, u_size:1, u_sizeRange:0.15, u_spreading:0.6 } },
-  { id:'neuroNoise', name:'Neuro', shader:'neuroNoiseFragmentShader', kind:'pattern',
-    uniforms:{ u_brightness:1.1, u_contrast:0.85 } },
-  { id:'perlinNoise', name:'Perlin', shader:'perlinNoiseFragmentShader', kind:'pattern',
-    uniforms:{ u_proportion:0.5, u_softness:0.4, u_octaveCount:4,
-               u_persistence:0.5, u_lacunarity:2 } },
-  { alphaFromColors:true, id:'simplexNoise', name:'Simplex', shader:'simplexNoiseFragmentShader', kind:'pattern',
-    uniforms:{ u_stepsPerColor:3, u_softness:0.4 } },
-  { id:'spiral', name:'Spiral', shader:'spiralFragmentShader', kind:'pattern',
-    uniforms:{ u_density:0.6, u_distortion:0.2, u_strokeWidth:0.5, u_strokeCap:0.3,
-               u_strokeTaper:0.2, u_noise:0.2, u_noiseFrequency:0.4, u_softness:0.2 } },
-  { alphaFromColors:true, id:'voronoi', name:'Voronoi', shader:'voronoiFragmentShader', kind:'pattern',
-    uniforms:{ u_stepsPerColor:2, u_distortion:0.35, u_gap:0.06, u_glow:0.4 } },
-  { alphaFromColors:true, id:'warp', name:'Warp', shader:'warpFragmentShader', kind:'pattern',
-    uniforms:{ u_proportion:0.5, u_softness:1, u_shape:1, u_shapeScale:0.3,
-               u_distortion:0.25, u_swirl:0.6, u_swirlIterations:8 } },
-  { id:'waves', name:'Waves', shader:'wavesFragmentShader', kind:'pattern',
-    uniforms:{ u_shape:1, u_frequency:0.5, u_amplitude:0.4, u_spacing:0.6,
-               u_proportion:0.5, u_softness:0.2 } },
-
-  // ── object family (v_objectUV, fit: contain) ─────────────────
-  { id:'colorPanels', name:'Panels', shader:'colorPanelsFragmentShader', kind:'object',
-    uniforms:{ u_density:0.8, u_angle1:0.4, u_angle2:0.6, u_length:1.2,
-               u_edges:false, u_blur:0.2, u_fadeIn:0.3, u_fadeOut:0.3, u_gradient:0.4 } },
-  { id:'godRays', name:'God Rays', shader:'godRaysFragmentShader', kind:'object',
-    uniforms:{ u_density:0.6, u_spotty:0.3, u_midSize:0.5, u_midIntensity:0.4,
-               u_intensity:0.9, u_bloom:0.4 } },
-  { id:'metaballs', name:'Metaballs', shader:'metaballsFragmentShader', kind:'object',
-    uniforms:{ u_size:1, u_sizeRange:0.3, u_count:12 } },
-  { id:'smokeRing', name:'Smoke', shader:'smokeRingFragmentShader', kind:'object',
-    uniforms:{ u_thickness:0.5, u_radius:0.6, u_innerShape:1.5,
-               u_noiseScale:1.4, u_noiseIterations:8 } },
-  { id:'swirl', name:'Swirl', shader:'swirlFragmentShader', kind:'object',
-    uniforms:{ u_bandCount:4, u_twist:0.6, u_center:0.15, u_proportion:0.5,
-               u_softness:0.6, u_noise:0.15, u_noiseFrequency:0.5 } },
-  { id:'staticRadial', name:'Radial', shader:'staticRadialGradientFragmentShader', kind:'object',
-    uniforms:{ u_radius:0.7, u_focalDistance:0.2, u_focalAngle:0, u_falloff:0.2,
-               u_mixing:0.5, u_distortion:0.2, u_distortionShift:0, u_distortionFreq:2,
-               u_grainMixer:0.1, u_grainOverlay:0.1 } },
-  { alphaFromColors:true, id:'meshGradient', name:'Mesh', shader:'meshGradientFragmentShader', kind:'object',
-    uniforms:{ u_distortion:0.8, u_swirl:0.5, u_grainMixer:0.1, u_grainOverlay:0.1 } },
-  { alphaFromColors:true, id:'staticMesh', name:'Mesh S', shader:'staticMeshGradientFragmentShader', kind:'object',
-    uniforms:{ u_positions:2, u_waveX:0.4, u_waveXShift:0.3, u_waveY:0.4,
-               u_waveYShift:0.3, u_mixing:0.6, u_grainMixer:0.1, u_grainOverlay:0.1 } },
-
-  // ── mixed families ───────────────────────────────────────────
+  // ── Texture — fine grain and tone, meant to sit quietly on the artwork ──
   { id:'grainGradient', name:'Grain', shader:'grainGradientFragmentShader', kind:'pattern',
-    uniforms:{ u_softness:0.5, u_intensity:0.4, u_noise:0.5, u_shape:1 } },
+    defaultOpacity:0.35, defaultBlend:'soft-light',
+    uniforms:{ u_softness:1, u_intensity:0.25, u_noise:0.65, u_shape:1 } },
   { id:'dithering', name:'Dither', shader:'ditheringFragmentShader', kind:'pattern',
-    uniforms:{ u_pxSize:3, u_shape:1, u_type:2 } },
+    defaultOpacity:0.3, defaultBlend:'overlay',
+    uniforms:{ u_pxSize:2, u_shape:1, u_type:3 } },
+  { id:'dotGrid', name:'Dots', shader:'dotGridFragmentShader', kind:'pattern',
+    defaultOpacity:0.28, defaultBlend:'multiply',
+    // Small dots on a tight lattice read as a print screen; large u_dotSize
+    // fills the cell and turns the whole layer into a flat wash.
+    uniforms:{ u_dotSize:0.12, u_gapX:0.08, u_gapY:0.08, u_strokeWidth:0,
+               u_sizeRange:0.25, u_opacityRange:0.55, u_shape:0 } },
+  { id:'paperGrain', name:'Paper', shader:'perlinNoiseFragmentShader', kind:'pattern',
+    defaultOpacity:0.3, defaultBlend:'soft-light',
+    // High octave count + low proportion = fibrous paper tooth, not clouds.
+    uniforms:{ u_proportion:0.32, u_softness:0.85, u_octaveCount:7,
+               u_persistence:0.42, u_lacunarity:2.4 } },
+  { id:'neuroNoise', name:'Fibre', shader:'neuroNoiseFragmentShader', kind:'pattern',
+    defaultOpacity:0.3, defaultBlend:'soft-light',
+    // noise = pow(noise, .7 + 6*u_contrast): anything above ~0.15 crushes
+    // the whole field to black.
+    uniforms:{ u_brightness:0.55, u_contrast:0.06 } },
+
+  // ── Light — soft glow and directional light ──────────────────
+  { id:'godRays', name:'Rays', shader:'godRaysFragmentShader', kind:'object',
+    defaultOpacity:0.4, defaultBlend:'screen',
+    uniforms:{ u_density:0.32, u_spotty:0.12, u_midSize:0.9, u_midIntensity:0.25,
+               u_intensity:0.5, u_bloom:0.7 } },
+  { id:'staticRadial', name:'Halo', shader:'staticRadialGradientFragmentShader', kind:'object',
+    defaultOpacity:0.45, defaultBlend:'screen',
+    uniforms:{ u_radius:0.95, u_focalDistance:0.1, u_focalAngle:0, u_falloff:0.55,
+               u_mixing:0.75, u_distortion:0.12, u_distortionShift:0,
+               u_distortionFreq:1.5, u_grainMixer:0.25, u_grainOverlay:0.15 } },
+  { id:'smokeRing', name:'Smoke', shader:'smokeRingFragmentShader', kind:'object',
+    defaultOpacity:0.4, defaultBlend:'screen',
+    uniforms:{ u_thickness:0.85, u_radius:0.5, u_innerShape:2.4,
+               u_noiseScale:0.9, u_noiseIterations:9 } },
+
+  // ── Gradient — broad, soft colour fields ─────────────────────
+  { alphaFromColors:true, id:'meshGradient', name:'Mesh', shader:'meshGradientFragmentShader', kind:'object',
+    defaultOpacity:0.38, defaultBlend:'soft-light',
+    uniforms:{ u_distortion:0.65, u_swirl:0.35, u_grainMixer:0.3, u_grainOverlay:0.2 } },
+  { alphaFromColors:true, id:'staticMesh', name:'Mesh S', shader:'staticMeshGradientFragmentShader', kind:'object',
+    defaultOpacity:0.38, defaultBlend:'soft-light',
+    uniforms:{ u_positions:3, u_waveX:0.35, u_waveXShift:0.4, u_waveY:0.35,
+               u_waveYShift:0.5, u_mixing:0.85, u_grainMixer:0.3, u_grainOverlay:0.2 } },
+  { alphaFromColors:true, id:'warp', name:'Warp', shader:'warpFragmentShader', kind:'pattern',
+    defaultOpacity:0.4, defaultBlend:'soft-light',
+    uniforms:{ u_proportion:0.5, u_softness:1, u_shape:1, u_shapeScale:0.12,
+               u_distortion:0.12, u_swirl:0.85, u_swirlIterations:10 } },
+  { alphaFromColors:true, id:'simplexNoise', name:'Drift', shader:'simplexNoiseFragmentShader', kind:'pattern',
+    defaultOpacity:0.35, defaultBlend:'soft-light',
+    // stepsPerColor 1 keeps it a continuous blend; higher values posterise.
+    uniforms:{ u_stepsPerColor:1, u_softness:1 } },
+
+  // ── Structure — visible geometry, still soft-edged ───────────
+  { id:'swirl', name:'Swirl', shader:'swirlFragmentShader', kind:'object',
+    defaultOpacity:0.35, defaultBlend:'soft-light',
+    uniforms:{ u_bandCount:2.5, u_twist:0.35, u_center:0.05, u_proportion:0.5,
+               u_softness:1, u_noise:0.35, u_noiseFrequency:0.35 } },
+  { id:'spiral', name:'Spiral', shader:'spiralFragmentShader', kind:'pattern',
+    defaultOpacity:0.3, defaultBlend:'soft-light',
+    uniforms:{ u_density:0.22, u_distortion:0.35, u_strokeWidth:0.5, u_strokeCap:0.6,
+               u_strokeTaper:0.7, u_noise:0.35, u_noiseFrequency:0.3, u_softness:1 } },
+  { id:'waves', name:'Waves', shader:'wavesFragmentShader', kind:'pattern',
+    defaultOpacity:0.25, defaultBlend:'soft-light',
+    // Waves has a binary front/back opacity, so it only reads well thin
+    // and softened — otherwise it is a hard two-colour stripe.
+    uniforms:{ u_shape:1, u_frequency:0.35, u_amplitude:0.55, u_spacing:0.85,
+               u_proportion:0.5, u_softness:1 } },
+  { alphaFromColors:true, id:'voronoi', name:'Cells', shader:'voronoiFragmentShader', kind:'pattern',
+    defaultOpacity:0.3, defaultBlend:'soft-light',
+    uniforms:{ u_stepsPerColor:1, u_distortion:0.45, u_gap:0.015, u_glow:0.85 } },
+  { id:'dotOrbit', name:'Orbit', shader:'dotOrbitFragmentShader', kind:'pattern',
+    defaultOpacity:0.45, defaultBlend:'multiply',
+    uniforms:{ u_stepsPerColor:1, u_size:1, u_sizeRange:0.12, u_spreading:0.55 } },
+  { id:'metaballs', name:'Blobs', shader:'metaballsFragmentShader', kind:'object',
+    defaultOpacity:0.5, defaultBlend:'soft-light',
+    uniforms:{ u_size:1, u_sizeRange:0.25, u_count:14 } },
+  { id:'colorPanels', name:'Panels', shader:'colorPanelsFragmentShader', kind:'object',
+    defaultOpacity:0.5, defaultBlend:'soft-light',
+    uniforms:{ u_density:0.75, u_angle1:0.25, u_angle2:0.6, u_length:2.4,
+               u_edges:false, u_blur:0.6, u_fadeIn:0.45, u_fadeOut:0.45, u_gradient:0.8 } },
 ];
 
 export const SHADER_BY_ID = Object.fromEntries(SHADERS.map(s => [s.id, s]));
@@ -98,22 +127,44 @@ export const SHADER_CONTROLS = [
   { type:'btngroup', id:'blend', label:'Blend',   default:'normal',
     options:['Normal','Multiply','Screen','Overlay','Soft'],
     values:['normal','multiply','screen','overlay','soft-light'] },
-  { type:'color', id:'color1',   label:'Shader 1', default:'#5100ff' },
-  { type:'color', id:'color2',   label:'Shader 2', default:'#00ff80' },
+  { type:'color', id:'color1',   label:'Shader 1', default:'#f4a37c' },
+  { type:'color', id:'color2',   label:'Shader 2', default:'#5b6bb5' },
 ];
 
-let _lib = null, _mount = null, _canvas = null, _noise;
+let _lib = null, _mount = null, _canvas = null;
 
 async function lib() {
   if (!_lib) _lib = await import(VENDOR);
   return _lib;
 }
 
-export function shaderState(s) {
+// 14 shaders sample a noise texture, and ShaderMount *throws* if an image
+// uniform is not fully decoded by mount time. Resolve it once, up front.
+let _noisePromise = null;
+function noiseTexture(L) {
+  if (_noisePromise) return _noisePromise;
+  const img = L.getShaderNoiseTexture?.();
+  if (!img) return (_noisePromise = Promise.resolve(null));
+  _noisePromise = img.complete && img.naturalWidth
+    ? Promise.resolve(img)
+    : new Promise(res => {
+        img.addEventListener('load',  () => res(img), { once: true });
+        img.addEventListener('error', () => res(null), { once: true });
+      });
+  return _noisePromise;
+}
+
+// Each shader carries its own opacity/blend, because the level that reads as
+// a finish differs wildly per effect — a grain wants 0.3 soft-light, a mesh
+// gradient wants 0.45. The user's own choice still wins once they touch it.
+export function shaderState(s, def) {
   const out = {};
   for (const c of SHADER_CONTROLS) {
     const k = '_sh_' + c.id;
-    out[c.id] = s[k] !== undefined ? s[k] : c.default;
+    if (s[k] !== undefined) { out[c.id] = s[k]; continue; }
+    if (c.id === 'opacity' && def?.defaultOpacity !== undefined) { out[c.id] = def.defaultOpacity; continue; }
+    if (c.id === 'blend'   && def?.defaultBlend   !== undefined) { out[c.id] = def.defaultBlend; continue; }
+    out[c.id] = c.default;
   }
   return out;
 }
@@ -179,15 +230,15 @@ if (typeof window !== 'undefined') {
   window.addEventListener('resize', repositionShaderLayer);
 }
 
-function buildUniforms(L, def, p) {
+function buildUniforms(L, def, p, noise) {
   // Most shaders composite against u_colorBack, so a transparent backdrop is
   // enough. Five of them (mesh gradients, voronoi, warp, simplex) have no
   // u_colorBack at all — their alpha comes straight from u_colors[i].a, so
   // the layer opacity has to travel in the colours themselves or they paint
   // an opaque field and hide the artwork completely.
   const a = def.alphaFromColors ? 0.85 : 1;
-  const c1 = rgba(p.color1, '#5100ff', a);
-  const c2 = rgba(p.color2, '#00ff80', a);
+  const c1 = rgba(p.color1, '#f4a37c', a);
+  const c2 = rgba(p.color2, '#5b6bb5', a);
   const sizing = def.kind === 'object' ? L.defaultObjectSizing : L.defaultPatternSizing;
   const u = {
     ...sizing,
@@ -219,10 +270,9 @@ function buildUniforms(L, def, p) {
   delete u.offsetX; delete u.offsetY; delete u.originX; delete u.originY;
   delete u.worldWidth; delete u.worldHeight;
 
-  // 14 shaders sample u_noiseTexture; without it WebGL binds the zero
-  // texture and the fragment stage yields nothing.
-  if (_noise === undefined) _noise = L.getShaderNoiseTexture?.() ?? null;
-  if (_noise) { u.u_noiseTexture = _noise; u.u_image = _noise; }
+  // Without the texture WebGL binds the zero texture and the fragment stage
+  // yields nothing; with a half-decoded one ShaderMount throws.
+  if (noise) { u.u_noiseTexture = noise; u.u_image = noise; }
   return u;
 }
 
@@ -234,7 +284,7 @@ export async function applyShader(svgEl, W, H, s) {
   const frag = L[def.shader];
   if (!frag) { console.warn(`[martes] unknown shader ${def.shader}`); return; }
 
-  const p = shaderState(s);
+  const p = shaderState(s, def);
   const host = svgEl.parentElement;
   if (!host) return;
 
@@ -251,7 +301,8 @@ export async function applyShader(svgEl, W, H, s) {
   });
   positionLayer(svgEl, host);
 
-  const uniforms = buildUniforms(L, def, p);
+  const noise = await noiseTexture(L);
+  const uniforms = buildUniforms(L, def, p, noise);
 
   if (_mount && _mount.__fx === def.shader) {
     try { _mount.setUniforms(uniforms); _mount.setSpeed?.(p.speed); kick(_mount); return; } catch {}
@@ -262,11 +313,6 @@ export async function applyShader(svgEl, W, H, s) {
   _mount = new L.ShaderMount(_canvas, frag, uniforms, { preserveDrawingBuffer: true }, p.speed);
   _mount.__fx = def.shader;
   kick(_mount);
-  if (_noise && !_noise.complete) {
-    _noise.addEventListener('load', () => {
-      if (_mount) { try { _mount.setUniforms({ u_noiseTexture: _noise }); } catch {} kick(_mount); }
-    }, { once: true });
-  }
 }
 
 // SVG export cannot carry the shader, so PNG is the only export that

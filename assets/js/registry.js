@@ -241,7 +241,15 @@ export function buildPanel(tool) {
           </div>
           ${activeSh !== 'none' ? `
             <div class="fx-warn">Preview &amp; PNG only — WebGL cannot be embedded in exported SVG.</div>
-            ${SHADER_CONTROLS.map(c => buildCtrl({ ...c, id: '_sh_' + c.id }, s, c.default)).join('')}
+            ${(() => {
+              const def = SHADER_BY_ID[activeSh];
+              return SHADER_CONTROLS.map(c => {
+                let fb = c.default;
+                if (c.id === 'opacity' && def?.defaultOpacity !== undefined) fb = def.defaultOpacity;
+                if (c.id === 'blend'   && def?.defaultBlend   !== undefined) fb = def.defaultBlend;
+                return buildCtrl({ ...c, id: '_sh_' + c.id }, s, fb);
+              }).join('');
+            })()}
           ` : ''}
         </div>
       </div>`;
@@ -286,9 +294,16 @@ function bindShaderEvents(tool, s) {
       pushUndo();
       s._shader = btn.dataset.shader;
       if (s._shader === 'none') teardownShader();
-      else for (const c of SHADER_CONTROLS) {
-        const key = '_sh_' + c.id;
-        if (s[key] === undefined) s[key] = c.default;
+      else {
+        // Seed from the shader's own tuned defaults, not the generic ones,
+        // and re-seed opacity/blend on every switch so each effect arrives
+        // at the level that suits it rather than inheriting the last one.
+        const def = SHADER_BY_ID[s._shader];
+        for (const c of SHADER_CONTROLS) {
+          const key = '_sh_' + c.id;
+          if (c.id === 'opacity' || c.id === 'blend') { delete s[key]; continue; }
+          if (s[key] === undefined) s[key] = c.default;
+        }
       }
       buildPanel(tool);
       renderTool();
