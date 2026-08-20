@@ -14,9 +14,37 @@ beforeAll(async () => {
 });
 
 describe('shader catalogue', () => {
-  it('offers 24 shaders plus None', () => {
-    expect(mod.SHADERS.length).toBeGreaterThanOrEqual(25);
+  it('offers a catalogue plus None', () => {
+    expect(mod.SHADERS.length).toBeGreaterThanOrEqual(20);
     expect(mod.SHADERS[0].id).toBe('none');
+  });
+
+  // The decisive property: these render *over* the artwork. A shader with no
+  // u_colorBack uniform always paints an opaque field and simply hides it,
+  // which looks like the feature is broken rather than like an effect.
+  it('every shader can render transparently over the artwork', () => {
+    // Two routes to transparency: a u_colorBack uniform, or an alpha that
+    // derives from u_colors (flagged with alphaFromColors). A shader with
+    // neither always paints an opaque field and hides the artwork.
+    const opaque = [];
+    for (const s of mod.SHADERS) {
+      if (!s.shader) continue;
+      const src = vendor[s.shader];
+      const hasColorBack = /uniform\s+vec4\s+u_colorBack/.test(src);
+      if (!hasColorBack && !s.alphaFromColors) opaque.push(s.id);
+      // Whichever route, the fragment stage must emit a variable alpha.
+      expect(/fragColor\s*=\s*vec4\([^;]*opacity/.test(src) || hasColorBack,
+        `${s.id} writes a constant alpha`).toBe(true);
+    }
+    expect(opaque, `these would cover the artwork: ${opaque.join(', ')}`).toEqual([]);
+  });
+
+  it('defaults to a blend and opacity that keep the artwork readable', () => {
+    const blend = mod.SHADER_CONTROLS.find(c => c.id === 'blend');
+    const opacity = mod.SHADER_CONTROLS.find(c => c.id === 'opacity');
+    // `overlay` at 0.55 washed the artwork out badly enough to read as a bug.
+    expect(blend.default).toBe('normal');
+    expect(opacity.default).toBeGreaterThanOrEqual(0.6);
   });
 
   it('every advertised shader exists in the vendored library', () => {
@@ -55,7 +83,7 @@ describe('shader catalogue', () => {
 
   it('resolves shader params from state with defaults', () => {
     const d = mod.shaderState({});
-    expect(d.opacity).toBe(0.55);
+    expect(d.opacity).toBe(0.8);
     const custom = mod.shaderState({ _sh_opacity: 0.9 });
     expect(custom.opacity).toBe(0.9);
   });
