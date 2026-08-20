@@ -23,7 +23,9 @@ export const MM_SHAPES = [
 ];
 
 // User custom shapes for mmmotif
-window.mmCustomShapes = window.mmCustomShapes || [];
+// globalThis rather than window: this module is also imported headlessly
+// through api.js, where `window` does not exist.
+globalThis.mmCustomShapes = globalThis.mmCustomShapes || [];
 
 // Color brightening/darkening — works with any CSS color via canvas
 function mmAdjustColor(color, amount) {

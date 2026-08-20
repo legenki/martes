@@ -26,6 +26,11 @@ import { svgEl } from './core.js';
   const btnNum    = document.getElementById('texSortNum');
   const btnRand   = document.getElementById('texSortRandom');
 
+  // Bail out cleanly when the Textures markup is absent (e.g. this module
+  // imported outside the app shell) instead of throwing and taking every
+  // later import in the entry graph down with it.
+  if (!grid || !paginEl || !searchEl || !countEl || !btnNum || !btnRand) return;
+
   let masterOrder = Array.from({length: TOTAL}, (_, i) => i + 1); // 1–360
   let filtered    = [...masterOrder];
   let currentPage = 1;

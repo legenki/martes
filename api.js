@@ -5,7 +5,10 @@
 export * as core from './assets/js/core.js';
 export * as helpers from './assets/js/tools/_helpers.js';
 export * as voronoi from './assets/js/tools/_voronoi.js';
-export * as palettes from './assets/js/palettes.js';
+// Only the palette *data* and the pure state helper. The rest of palettes.js
+// drives the dropdown and pulls in registry.js -> actions.js, i.e. the whole
+// browser UI, which has no place in a headless entry point.
+export { NICE_PALETTES, applyPaletteToTool } from './assets/js/palettes.data.js';
 
 import splat from './assets/js/tools/splat.js';
 import dust from './assets/js/tools/dust.js';

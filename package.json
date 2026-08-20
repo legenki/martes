@@ -2,7 +2,7 @@
   "name": "martes",
   "version": "1.0.0",
   "description": "Local design canvas \u2014 34 SVG generators and a 360-texture browser, served from a single Node process.",
-  "main": "server.js",
+  "main": "./api.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
@@ -35,5 +35,26 @@
   "devDependencies": {
     "jsdom": "^30.0.1",
     "vitest": "^4.1.11"
-  }
+  },
+  "type": "module",
+  "exports": {
+    ".": "./api.js",
+    "./core": "./assets/js/core.js",
+    "./palettes": "./assets/js/palettes.data.js",
+    "./tools/*": "./assets/js/tools/*.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "api.js",
+    "assets/js/",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "./assets/js/registry.js",
+    "./assets/js/actions.js",
+    "./assets/js/keyboard.js",
+    "./assets/js/textures.js",
+    "./assets/js/palettes.js"
+  ]
 }

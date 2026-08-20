@@ -38,7 +38,9 @@ export const BB_SHAPES = [
     d:'M -70,22 C -70,-58 70,-58 70,22' },
 ];
 
-window.bbburstCustomShapes = window.bbburstCustomShapes || [];
+// globalThis rather than window: this module is also imported headlessly
+// through api.js, where `window` does not exist.
+globalThis.bbburstCustomShapes = globalThis.bbburstCustomShapes || [];
 
 
 function renderBurst(svg, W, H, s) {
@@ -136,7 +138,7 @@ function renderBurst(svg, W, H, s) {
 
 
   });
-  window.DEBUG_MARKUP = markup.length; svg.innerHTML = markup;
+  svg.innerHTML = markup;
 }
 
 export default {

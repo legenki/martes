@@ -128,3 +128,27 @@ describe('no debug instrumentation ships', () => {
     expect(found, found.join('\n')).toEqual([]);
   });
 });
+
+describe('textures tab', () => {
+  it('textures.js is loaded by the app', () => {
+    const html = read('../index.html');
+    const entry = read('../assets/js/registry.js');
+    expect(html.includes('assets/js/textures.js') || entry.includes('./textures.js'),
+      'nothing loads textures.js — the Textures tab renders an empty grid').toBe(true);
+  });
+
+  it('the markup provides every node textures.js binds to', () => {
+    const html = read('../index.html');
+    for (const id of ['texGrid','texPagination','texSearch','texCount','texSortNum','texSortRandom']) {
+      expect(html.includes(`id="${id}"`), `index.html is missing #${id}`).toBe(true);
+    }
+  });
+});
+
+describe('production markup', () => {
+  it('ships no debug error handler that hijacks document.title', () => {
+    const html = read('../index.html');
+    expect(/document\.title\s*=\s*["'](ERROR|REJ)/.test(html),
+      'index.html still contains the scratch window.onerror title handler').toBe(false);
+  });
+});

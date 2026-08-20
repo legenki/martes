@@ -6,6 +6,7 @@ import { pushUndo } from './history.js';
 // keyboard shortcuts on load. registry.js is the app's only entry point.
 import './actions.js';
 import './keyboard.js';
+import './textures.js';
 import { currentPalette, currentPaletteIndex, applyPaletteToTool, applyPaletteGlobal } from './palettes.js';
 import splat from './tools/splat.js';
 import dust from './tools/dust.js';
@@ -91,8 +92,8 @@ export const TOOLS = [
 // Shared custom-shape stores. Declared here as globals so registry.js
 // helpers can reference them even before burst.js/tessera.js execute.
 // Those files use `window.X = window.X || []` to honour what's here.
-window.bbburstCustomShapes = window.bbburstCustomShapes || [];
-window.mmCustomShapes      = window.mmCustomShapes      || [];
+globalThis.bbburstCustomShapes = globalThis.bbburstCustomShapes || [];
+globalThis.mmCustomShapes      = globalThis.mmCustomShapes      || [];
 
 // ═══════════════════════════════════════════════════════════════
 // RAF THROTTLE — avoid 60+ re-renders/s when dragging sliders

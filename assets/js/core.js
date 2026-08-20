@@ -28,11 +28,24 @@ export function rgbToHex(r,g,b) {
   return '#' + [r,g,b].map(v => Math.round(v).toString(16).padStart(2,'0')).join('');
 }
 
-// Parse any CSS color string to [r,g,b] via canvas (single cached instance)
-const _colorCvs = document.createElement('canvas');
-_colorCvs.width = _colorCvs.height = 1;
-const _colorCtx = _colorCvs.getContext('2d');
+// True when a real DOM is available. api.js is imported in Node for headless
+// rendering, where touching `document` at module scope would throw before a
+// single generator could run.
+export const hasDOM = typeof document !== 'undefined';
+
+// Parse any CSS color string to [r,g,b] via canvas (one cached 1x1 context,
+// created on first use so importing this module never requires a DOM).
+let _colorCtx;
 export function parseColor(color) {
+  if (_colorCtx === undefined) {
+    if (!hasDOM) { _colorCtx = null; }
+    else {
+      const cvs = document.createElement('canvas');
+      cvs.width = cvs.height = 1;
+      _colorCtx = cvs.getContext('2d');
+    }
+  }
+  if (!_colorCtx) return [0, 0, 0];
   _colorCtx.clearRect(0, 0, 1, 1);
   _colorCtx.fillStyle = color || '#000000';
   _colorCtx.fillRect(0, 0, 1, 1);
@@ -106,8 +119,8 @@ export let currentTool = null;
 export function setCurrentTool(t) { currentTool = t; }
 export const toolState = {};
 
-export const svg = document.getElementById('svgCanvas');
-export const canvasArea = document.getElementById('canvasArea');
+export const svg = hasDOM ? document.getElementById('svgCanvas') : null;
+export const canvasArea = hasDOM ? document.getElementById('canvasArea') : null;
 // Imported `let` bindings are read-only in the importing module, so canvas
 // size changes have to come back through here.
 export function setCanvasSize(w, h) {
@@ -116,6 +129,7 @@ export function setCanvasSize(w, h) {
 }
 
 export function resizeCanvas() {
+  if (!svg) return;
   svg.setAttribute('width', canvasW);
   svg.setAttribute('height', canvasH);
   svg.setAttribute('viewBox', `0 0 ${canvasW} ${canvasH}`);
@@ -123,6 +137,7 @@ export function resizeCanvas() {
 }
 
 export function fitCanvas() {
+  if (!svg || !canvasArea) return;
   // 32px padding inside the canvas wrapper, but never below 0 on tiny screens.
   const aW = Math.max(0, canvasArea.clientWidth  - 32);
   const aH = Math.max(0, canvasArea.clientHeight - 32);
@@ -131,13 +146,13 @@ export function fitCanvas() {
   svg.style.height = Math.round(canvasH * scale) + 'px';
 }
 
-window.addEventListener('resize', fitCanvas);
+if (hasDOM) window.addEventListener('resize', fitCanvas);
 
 // ═══════════════════════════════════════════════════════════════
 // CLEAR & RENDER
 // ═══════════════════════════════════════════════════════════════
 export function clearSVG() {
-  svg.replaceChildren();
+  if (svg) svg.replaceChildren();
 }
 
 export function renderTool() {
@@ -168,7 +183,7 @@ export function getState() {
 // ═══════════════════════════════════════════════════════════════
 // TAB SWITCHING (tools / textures)
 // ═══════════════════════════════════════════════════════════════
-document.querySelectorAll('.tab-btn').forEach(btn => {
+if (hasDOM) document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -186,6 +201,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 // SIDEBAR TOGGLE (responsive hamburger menu)
 // ═══════════════════════════════════════════════════════════════
 (function initSidebarToggle() {
+  if (!hasDOM) return;
   const toggle   = document.getElementById('sidebarToggle');
   const sidebar  = document.getElementById('sidebarEl');
   const backdrop = document.getElementById('sidebarBackdrop');
@@ -244,6 +260,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 // THEME TOGGLE
 // ═══════════════════════════════════════════════════════════════
 (function initThemeToggle() {
+  if (!hasDOM) return;
   const btn = document.getElementById('themeToggle');
   if (!btn) return;
   btn.addEventListener('click', () => {

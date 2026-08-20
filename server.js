@@ -4,9 +4,12 @@
  *   /          → index.html
  *   /<path>    → file under project root, with path-traversal protection.
  */
-const http = require('http');
-const fs   = require('fs');
-const path = require('path');
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PORT = process.env.PORT || 8081;
 const ROOT = path.resolve(__dirname);

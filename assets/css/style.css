@@ -355,7 +355,10 @@ html, body {
 .ctrl-val   { font-size: 0.72rem; color: var(--text-primary); font-weight: 600; min-width: 2.5rem; text-align: right; }
 
 .ctrl-num-input {
-  width: 3.5rem;
+  /* 3.5rem clipped values like "0.102" once the native spinner arrows claimed
+     their share of the box. The arrows are redundant next to the slider, so
+     they are hidden and the field gets room for the longest value. */
+  width: 4.25rem;
   background: var(--bg-canvas);
   border: 1px solid var(--border);
   color: var(--text-primary);
@@ -369,6 +372,9 @@ html, body {
 .ctrl-num-input:focus {
   border-color: var(--accent);
 }
+.ctrl-num-input::-webkit-outer-spin-button,
+.ctrl-num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.ctrl-num-input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
 
 input[type="range"] {
@@ -412,8 +418,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .btn-group { display: flex; gap: 0.3rem; flex-wrap: wrap; }
 .btn-opt {
-  flex: 1; min-width: 2rem;
-  padding: 0.35rem 0.3rem;
+  /* Grow to share the row, but never shrink below the label's own width —
+     `flex:1` alone forced every option to an equal width, clipping longer
+     labels ("Saturation" -> "Satur") because of the nowrap below. */
+  flex: 1 0 auto;
+  min-width: max-content;
+  padding: 0.35rem 0.5rem;
   border: 1px solid var(--border);
   border-radius: 0.4rem;
   background: var(--bg-main);
