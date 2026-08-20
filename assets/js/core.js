@@ -1,17 +1,49 @@
 // ═══════════════════════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════════════════════
-export const rnd = (min, max) => Math.random() * (max - min) + min;
-export const rndInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-export const pick = arr => arr[Math.floor(Math.random() * arr.length)];
-export const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-export const lerp = (a, b, t) => a + (b - a) * t;
-export const map = (v, a, b, c, d) => c + (d - c) * ((v - a) / (b - a));
-
 // Monotonic ID counter for SVG defs (filter, gradient, clipPath, …).
 // Replaces `Date.now()` which collides on rapid re-renders.
 let _uidCounter = 0;
 export function uid(prefix) { return prefix + '-' + (++_uidCounter); }
+
+// ── Random source ──────────────────────────────────────────────
+// Every generator draws randomness through `random()` rather than
+// Math.random directly, so a caller can make output reproducible:
+//
+//     setSeed(42); tool.render(svg, w, h, state);   // same art every run
+//     setSeed(null);                                // back to Math.random
+//
+// mulberry32 — small, fast, well-distributed for visual work.
+let _rng = Math.random;
+export function random() { return _rng(); }
+export function setSeed(seed) {
+  // Reset the def-id counter too: reproducible output means the whole
+  // document matches, and clipPath/filter/gradient ids are part of it.
+  _uidCounter = 0;
+  if (seed === null || seed === undefined) { _rng = Math.random; return; }
+  let a = (typeof seed === 'number' ? seed : hashString(String(seed))) >>> 0;
+  _rng = function mulberry32() {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+export function hashString(str) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+export const rnd = (min, max) => random() * (max - min) + min;
+export const rndInt = (min, max) => Math.floor(random() * (max - min + 1)) + min;
+export const pick = arr => arr[Math.floor(random() * arr.length)];
+export const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+export const lerp = (a, b, t) => a + (b - a) * t;
+export const map = (v, a, b, c, d) => c + (d - c) * ((v - a) / (b - a));
 
 export function svgEl(tag, attrs = {}) {
   const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -31,7 +63,7 @@ export function rgbToHex(r,g,b) {
 // True when a real DOM is available. api.js is imported in Node for headless
 // rendering, where touching `document` at module scope would throw before a
 // single generator could run.
-export const hasDOM = typeof document !== 'undefined';
+export const hasDOM = typeof document !== 'undefined' && typeof window !== 'undefined';
 
 // Parse any CSS color string to [r,g,b] via canvas (one cached 1x1 context,
 // created on first use so importing this module never requires a DOM).

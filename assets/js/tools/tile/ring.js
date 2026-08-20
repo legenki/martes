@@ -1,5 +1,5 @@
 // 10. Ring — two concentric ring outlines, the outer one nudged by random offset.
-import { svgEl } from '../../core.js';
+import { svgEl, random } from '../../core.js';
 import { parseGrid, tileGrid, pickFrom, chance, rotateAttr, setupTile, registerTilePreset } from '../_helpers.js';
 
 function renderTileRing(svg, W, H, s) {
@@ -15,8 +15,8 @@ function renderTileRing(svg, W, H, s) {
     const strokeW = 40 / rows;
     const g = svgEl('g', { transform: rotateAttr(angle, cx, cy) });
     // Outer (offset, lower opacity)
-    const dx = (Math.random() * 0.4 - 0.2) * sz;
-    const dy = (Math.random() * 0.4 - 0.2) * sz;
+    const dx = (random() * 0.4 - 0.2) * sz;
+    const dy = (random() * 0.4 - 0.2) * sz;
     g.appendChild(svgEl('circle', {
       cx: cx + dx, cy: cy + dy, r: sz/2,
       fill:'none', stroke: outerColor, 'stroke-width': strokeW, opacity: 0.4

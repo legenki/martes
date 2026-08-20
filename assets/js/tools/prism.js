@@ -1,5 +1,5 @@
 // ── 16. rrrainbow — uniform rainbow circles via Voronoi ────────
-import { rnd, clamp, svgEl } from '../core.js';
+import { rnd, clamp, svgEl, random } from '../core.js';
 import { buildUniformVoronoi } from './_voronoi.js';
 
 function renderPrism(svg, W, H, s) {
@@ -11,7 +11,7 @@ function renderPrism(svg, W, H, s) {
 
   cells.forEach((cell, i) => {
     // Probability: skip some cells
-    if (Math.random() > prob) return;
+    if (random() > prob) return;
 
     // Radius: cell.r * sizeFactor
     const sizeFactor = rnd(s.minFill, s.maxFill);
@@ -24,7 +24,7 @@ function renderPrism(svg, W, H, s) {
 
     const ft = s.fillType || 'solid';
     // 'mixture': randomly solid or outline
-    const isOutline = ft === 'outline' || (ft === 'mixture' && Math.random() > 0.5);
+    const isOutline = ft === 'outline' || (ft === 'mixture' && random() > 0.5);
 
     markup += `<circle cx="${cell.cx.toFixed(1)}" cy="${cell.cy.toFixed(1)}" r="${r.toFixed(1)}" fill="${isOutline ? 'none' : color}" stroke="${isOutline ? color : 'none'}" stroke-width="${isOutline ? (r * 0.12).toFixed(1) : 0}" opacity="${opacity}" />`;
   });

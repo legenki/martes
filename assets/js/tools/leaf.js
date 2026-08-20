@@ -3,7 +3,7 @@
 // Voronoi tessellation places leaves; noise grid drives rotation/scale/opacity.
 // fillType: 'solid' | 'mixture' | 'stroke'
 // Blur tiers: scaleValue<0.2→stdDev12, <0.3→4, <0.4→2
-import { map, svgEl, uid } from '../core.js';
+import { map, svgEl, uid, random } from '../core.js';
 import { buildUniformVoronoi } from './_voronoi.js';
 
 const LL_LEAF_D = 'M0 0h50c28 0 50 22 50 50H50C22 50 0 28 0 0Z';
@@ -43,7 +43,7 @@ function renderLeaf(svg, W, H, s) {
 
   // Simple smooth noise for coherent angle/scale field
   // Using value noise seeded per render
-  const seed = Math.random() * 1000;
+  const seed = random() * 1000;
   function smoothNoise(x, y) {
     const nx = x * regularity * 80 + seed;
     const ny = y * regularity * 80 + seed * 1.618;
@@ -52,7 +52,7 @@ function renderLeaf(svg, W, H, s) {
   }
 
   cells.forEach(cell => {
-    if (Math.random() > prob) return;
+    if (random() > prob) return;
 
     const cx = Math.round(cell.cx);
     const cy = Math.round(cell.cy);
@@ -63,7 +63,7 @@ function renderLeaf(svg, W, H, s) {
     const opacityVal= map(nv, -1, 1, 0.15, 1);
 
     // Pick group
-    const isStroke = (fillType === 'stroke') || (fillType === 'mixture' && Math.random() > 0.55);
+    const isStroke = (fillType === 'stroke') || (fillType === 'mixture' && random() > 0.55);
 
     const size = 100 * scaleVal;
     const half = size / 2;

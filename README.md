@@ -169,6 +169,61 @@ The server intentionally has no proxy, no remote fetches, no third-party endpoin
 
 ---
 
+## Programmatic API
+
+Martes ships a headless entry point: every generator is a pure function from
+state to SVG, usable without the browser app.
+
+```js
+import { tools, NICE_PALETTES, applyPaletteToTool, core } from 'martes';
+
+// Any DOM implementation works — a real browser, or jsdom in Node:
+//   const { window } = new JSDOM('<!doctype html><html></html>');
+//   globalThis.document = window.document;
+const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+svg.setAttribute('viewBox', '0 0 600 900');
+
+const tool  = tools.radius;                       // one of 34
+const state = Object.fromEntries(tool.controls.map(c => [c.id, c.default]));
+
+core.setSeed('release-poster');                   // reproducible output
+tool.render(svg, 600, 900, state);
+console.log(svg.outerHTML);
+```
+
+### Reproducibility
+
+Generators draw randomness through `core.random()`. Seeding makes a render
+byte-for-byte identical — including generated `clipPath`/`filter` ids:
+
+```js
+core.setSeed(42);    // number or string
+core.setSeed(null);  // back to Math.random()
+```
+
+### Palettes
+
+`NICE_PALETTES` holds 104 five-colour palettes. `applyPaletteToTool` writes a
+palette into a tool's colour slots, cycling it so every slot is filled:
+
+```js
+const store = {};
+applyPaletteToTool(tool, NICE_PALETTES[7], store);
+Object.assign(state, store[tool.slug]);
+```
+
+### Entry points
+
+| Import | Contents |
+| --- | --- |
+| `martes` | `tools`, `core`, `helpers`, `voronoi`, `NICE_PALETTES`, `applyPaletteToTool` |
+| `martes/core` | utilities — `toHex`, `setSeed`, `random`, `svgEl`, `lerp`, … |
+| `martes/palettes` | palette data only, no DOM dependency |
+| `martes/tools/*` | a single generator, e.g. `martes/tools/tile/radius` |
+
+Rendering needs a `document`; importing does not. In Node, pair it with
+[`jsdom`](https://github.com/jsdom/jsdom) and assign `globalThis.document`.
+
 ## Keyboard shortcuts
 
 | Key | Action |

@@ -73,3 +73,51 @@ describe('headless safety', () => {
     expect(problems, problems.join('\n')).toEqual([]);
   });
 });
+
+describe('deterministic rendering', () => {
+  it('exposes setSeed through core', () => {
+    expect(typeof api.core.setSeed).toBe('function');
+    expect(typeof api.core.random).toBe('function');
+  });
+
+  it('the same seed reproduces byte-identical output for every generator', () => {
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const render = (tool) => {
+      const svg = document.createElementNS(SVG_NS, 'svg');
+      tool.render(svg, 600, 900, defaultState(tool));
+      return svg.innerHTML;
+    };
+    const mismatches = [];
+    for (const [key, tool] of Object.entries(api.tools)) {
+      api.core.setSeed(1234);
+      const a = render(tool);
+      api.core.setSeed(1234);
+      const b = render(tool);
+      if (a !== b) mismatches.push(key);
+    }
+    api.core.setSeed(null);
+    expect(mismatches, `not reproducible under a fixed seed: ${mismatches.join(', ')}`).toEqual([]);
+  });
+
+  it('different seeds produce different art', () => {
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const tool = api.tools.splat;
+    const render = () => {
+      const svg = document.createElementNS(SVG_NS, 'svg');
+      tool.render(svg, 600, 900, defaultState(tool));
+      return svg.innerHTML;
+    };
+    api.core.setSeed(1); const a = render();
+    api.core.setSeed(2); const b = render();
+    api.core.setSeed(null);
+    expect(a).not.toBe(b);
+  });
+
+  it('accepts a string seed', () => {
+    expect(() => api.core.setSeed('martes')).not.toThrow();
+    const v = api.core.random();
+    api.core.setSeed('martes');
+    expect(api.core.random()).toBe(v);
+    api.core.setSeed(null);
+  });
+});

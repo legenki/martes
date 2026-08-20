@@ -1,5 +1,5 @@
 // ── 1. ttten — 10-Print diagonal lines ──────────────────────
-import { rnd, map, svgEl } from '../core.js';
+import { rnd, map, svgEl, random } from '../core.js';
 
 function renderSlash(svg, W, H, s) {
   const { blockSize, strokeWidth, probability, color, lineCap, opacityMode, opacity } = s;
@@ -24,7 +24,7 @@ function renderSlash(svg, W, H, s) {
     for (let col = 0; col < cols; col++) {
       const x = col * blockSize;
       const y = row * blockSize;
-      const diag = Math.random() > probability;
+      const diag = random() > probability;
 
       let lineOpacity = opacity;
       if (opacityMode === 'fade') lineOpacity = opacity * map(row, 0, rows-1, 1, 0.05);

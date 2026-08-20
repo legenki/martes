@@ -1,4 +1,4 @@
-import { uid, svgEl } from '../core.js';
+import { uid, svgEl, random } from '../core.js';
 // ═══════════════════════════════════════════════════════════════
 // TILE — shared helpers for grid presets (clip-paths, filters, palette)
 // Used by all tools/tile/*.js preset files.
@@ -33,8 +33,8 @@ export function tileGrid(parent, W, H, gridStr, bgColor, paint) {
 }
 
 // ── Helpers ────────────────────────────────────────────────────
-export function pickFrom(arr)  { return arr[Math.floor(Math.random() * arr.length)]; }
-export function chance(p)      { return Math.random() < p; }
+export function pickFrom(arr)  { return arr[Math.floor(random() * arr.length)]; }
+export function chance(p)      { return random() < p; }
 export function rotateAttr(angle, cx, cy) { return `rotate(${angle} ${cx} ${cy})`; }
 
 // Weighted-ish pick from many args — modelled as

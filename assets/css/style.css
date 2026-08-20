@@ -7,6 +7,10 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
+  /* Tells the browser to paint native widgets — number-input spinners,
+     scrollbars, focus rings — in dark mode. Without it they render light
+     on the dark UI: the spinner arrows stayed white and overflowed. */
+  color-scheme: dark;
   --bg-main:        #18181b;
   --bg-soft:        #27272a;
   --bg-canvas:      #09090b;
@@ -29,6 +33,7 @@
 }
 
 [data-theme="light"] {
+  color-scheme: light;
   --bg-main:        #ffffff;
   --bg-soft:        #fafafa;
   --bg-canvas:      #f4f4f5;
@@ -927,3 +932,23 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 [data-theme="light"] .icon-moon { display: none !important; }
 [data-theme="light"] .icon-sun { display: block !important; }
+
+/* ── Inline status toast (replaces blocking alert()) ─────────── */
+.martes-toast {
+  position: fixed;
+  bottom: 1.25rem; left: 50%;
+  transform: translateX(-50%) translateY(0.5rem);
+  z-index: 200;
+  max-width: min(28rem, calc(100vw - 2rem));
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-strong, var(--border));
+  background: var(--bg-soft);
+  color: var(--text-primary);
+  font-size: 0.78rem; line-height: 1.35;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.18s, transform 0.18s;
+}
+.martes-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+.martes-toast.error   { border-color: #e5484d; }

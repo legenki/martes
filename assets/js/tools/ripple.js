@@ -1,5 +1,5 @@
 // ── 12. sssquiggly — squiggly background lines ──────────
-import { rnd, lerp, svgEl, lerpColor } from '../core.js';
+import { rnd, lerp, svgEl, lerpColor, random } from '../core.js';
 
 function renderRipple(svg, W, H, s) {
   const bg = svgEl('rect',{x:0,y:0,width:W,height:H,fill:s.bgColor});
@@ -21,9 +21,9 @@ function renderRipple(svg, W, H, s) {
     let x = 0;
     while (x < W) {
       const cp1x = x + segLen * 0.3;
-      const cp1y = y + (Math.random() > 0.5 ? amp : -amp);
+      const cp1y = y + (random() > 0.5 ? amp : -amp);
       const cp2x = x + segLen * 0.7;
-      const cp2y = y + (Math.random() > 0.5 ? amp : -amp);
+      const cp2y = y + (random() > 0.5 ? amp : -amp);
       x += segLen;
       d += ` C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${x} ${y}`;
     }

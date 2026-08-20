@@ -6,6 +6,25 @@ import { pushUndo } from './history.js';
 import { BB_SHAPES } from './tools/burst.js';
 import { MM_SHAPES } from './tools/tessera.js';
 
+
+// ── Inline status toast ────────────────────────────────────────
+// alert() blocks the whole page and looks nothing like the rest of the UI;
+// these failures are all recoverable, so report them inline instead.
+function toast(message, kind = 'error') {
+  let el = document.getElementById('martesToast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'martesToast';
+    el.setAttribute('role', 'status');
+    el.setAttribute('aria-live', 'polite');
+    document.body.appendChild(el);
+  }
+  el.textContent = message;
+  el.className = 'martes-toast ' + kind + ' visible';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('visible'), 3200);
+}
+
 // ═══════════════════════════════════════════════════════════════
 // ACTION BUTTONS
 // ═══════════════════════════════════════════════════════════════
@@ -86,7 +105,7 @@ export async function doCopy() {
     const orig = btn.innerHTML;
     btn.innerHTML = '✓ Copied';
     setTimeout(() => { btn.innerHTML = orig; }, 1500);
-  } catch(e) { alert('Copy failed: ' + e); }
+  } catch(e) { toast('Copy failed — clipboard access was denied.'); }
 }
 
 
@@ -128,7 +147,7 @@ export function doImportJSON() {
         toolState[tool.slug] = data.state;
         selectTool(tool);
       } catch (err) {
-        alert("Failed to import: " + err.message);
+        toast("Import failed: " + err.message);
       }
     };
     reader.readAsText(file);
@@ -163,7 +182,7 @@ export function doSavePNG() {
   };
   img.onerror = () => {
     URL.revokeObjectURL(url);
-    alert('PNG export failed — the SVG may contain unsupported features');
+    toast('PNG export failed — the SVG may contain unsupported features.');
   };
   img.src = url;
 }

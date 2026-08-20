@@ -1,5 +1,5 @@
 // 8. Terrain — small floating shapes + box-shadow rules (top-edge / left-edge lines).
-import { svgEl } from '../../core.js';
+import { svgEl, random } from '../../core.js';
 import { parseGrid, tileGrid, pickFrom, chance, setupTile, registerTilePreset } from '../_helpers.js';
 
 function renderTileTerrain(svg, W, H, s) {
@@ -13,10 +13,10 @@ function renderTileTerrain(svg, W, H, s) {
     if (chance(freq)) cell.appendChild(svgEl('rect', { x, y, width:1, height:h, fill: pal[1] }));
     // Small floating shape (8–32px, scaled to cell width).
     if (chance(freq)) {
-      const size = (8 + Math.random() * 24) * 6 / cols;
+      const size = (8 + random() * 24) * 6 / cols;
       const cx = x + w / 2, cy = y + h / 2;
       const fill = pickFrom([pal[2], pal[3], pal[4], pal[5]]);
-      const kind = Math.floor(Math.random() * 3);
+      const kind = Math.floor(random() * 3);
       if (kind === 0) {
         // Triangle
         cell.appendChild(svgEl('polygon', {

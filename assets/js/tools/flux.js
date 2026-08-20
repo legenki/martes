@@ -4,7 +4,7 @@
 //   feTurbulence → feGaussianBlur → feBlend → optional feColorMatrix saturate
 //   Linear or radial gradient rect as SourceGraphic
 //
-import { rndInt, uid, svgEl } from '../core.js';
+import { rndInt, uid, svgEl, random } from '../core.js';
 
 function renderFlux(svg, W, H, s) {
   const color1   = s.color1   || 'hsl(200,90%,50%)';
@@ -25,7 +25,7 @@ function renderFlux(svg, W, H, s) {
 
   svg.appendChild(svgEl('rect', {x:0,y:0,width:W,height:H,fill:bgColor}));
 
-  const uid = 'ffflux-' + Math.random().toString(36).slice(2,8);
+  const uid = 'ffflux-' + random().toString(36).slice(2,8);
   const filterId = uid + '-f';
   const gradId   = uid + '-g';
 

@@ -1,4 +1,4 @@
-import { clamp, lerp } from '../core.js';
+import { clamp, lerp, random } from '../core.js';
 // ═══════════════════════════════════════════════════════════════
 // SHARED — Voronoi engine + SVG shape parsing utilities
 // Used by: burst.js, leaf.js, prism.js
@@ -112,11 +112,11 @@ export function buildUniformVoronoi(W, H, N, cx, cy, biasStrength) {
   N = Math.max(1, Math.floor(Number(N) || 1));
   // Step 1: seed with random-bias toward focus point
   function seedPt() {
-    const rx = Math.random(), ry = Math.random();
+    const rx = random(), ry = random();
     // Bias: pull toward (cx/W, cy/H) with strength
     const bx = cx / W, by = cy / H;
-    const px = rx + (bx - rx) * (1 - Math.pow(Math.random(), biasStrength));
-    const py = ry + (by - ry) * (1 - Math.pow(Math.random(), biasStrength));
+    const px = rx + (bx - rx) * (1 - Math.pow(random(), biasStrength));
+    const py = ry + (by - ry) * (1 - Math.pow(random(), biasStrength));
     return { x: clamp(px, 0, 1) * W, y: clamp(py, 0, 1) * H };
   }
   let pts = Array.from({length: N}, seedPt);
