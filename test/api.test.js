@@ -51,7 +51,10 @@ describe('public API surface', () => {
 
 describe('headless safety', () => {
   it('no module in the api graph touches the DOM at import scope', async () => {
-    const { readFileSync } = await import('fs');
+    const { readFileSync, readdirSync } = await import('fs');
+    const { resolve } = await import('path');
+    // jsdom's import.meta.url is not a file: URL; vitest runs from the root.
+    const at = (p) => resolve(process.cwd(), p);
     const problems = [];
     const files = [
       'assets/js/core.js',
@@ -60,14 +63,26 @@ describe('headless safety', () => {
       'assets/js/tools/_voronoi.js',
       'assets/js/tools/burst.js',
       'assets/js/tools/tessera.js',
+      ...readdirSync(at('assets/js/tools'))
+        .filter(f => f.endsWith('.js')).map(f => 'assets/js/tools/' + f),
+      ...readdirSync(at('assets/js/tools/tile'))
+        .filter(f => f.endsWith('.js')).map(f => 'assets/js/tools/tile/' + f),
     ];
     for (const f of files) {
-      const src = readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+      const src = readFileSync(at(f), 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .split('\n').filter(l => !l.trim().startsWith('//')).join('\n');
+      // `window` is browser-only and `getContext` needs a canvas backend —
+      // both blow up in Node. Neither belongs anywhere in the API graph, at
+      // module scope or inside a render path.
       for (const line of src.split('\n')) {
-        // Top-level statements only (no leading whitespace = module scope).
-        if (/^(window|document)\./.test(line) && !/^\/\//.test(line.trim())) {
-          problems.push(`${f}: ${line.trim().slice(0, 70)}`);
-        }
+        if (/^(window|document)\./.test(line)) problems.push(`${f}: module-scope DOM — ${line.trim().slice(0, 60)}`);
+        // core.js legitimately drives browser-only UI behind `hasDOM`;
+        // generator files have no such excuse — they must stay portable.
+        if (/\bwindow\./.test(line) && f.includes('/tools/'))
+          problems.push(`${f}: uses window — ${line.trim().slice(0, 60)}`);
+        if (/getContext\(/.test(line) && !f.endsWith('core.js'))
+          problems.push(`${f}: getContext outside core — ${line.trim().slice(0, 60)}`);
       }
     }
     expect(problems, problems.join('\n')).toEqual([]);

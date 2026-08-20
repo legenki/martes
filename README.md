@@ -171,11 +171,15 @@ The server intentionally has no proxy, no remote fetches, no third-party endpoin
 
 ## Programmatic API
 
+```bash
+npm install @legenki/martes
+```
+
 Martes ships a headless entry point: every generator is a pure function from
 state to SVG, usable without the browser app.
 
 ```js
-import { tools, NICE_PALETTES, applyPaletteToTool, core } from 'martes';
+import { tools, NICE_PALETTES, applyPaletteToTool, core } from '@legenki/martes';
 
 // Any DOM implementation works — a real browser, or jsdom in Node:
 //   const { window } = new JSDOM('<!doctype html><html></html>');
@@ -216,10 +220,10 @@ Object.assign(state, store[tool.slug]);
 
 | Import | Contents |
 | --- | --- |
-| `martes` | `tools`, `core`, `helpers`, `voronoi`, `NICE_PALETTES`, `applyPaletteToTool` |
-| `martes/core` | utilities — `toHex`, `setSeed`, `random`, `svgEl`, `lerp`, … |
-| `martes/palettes` | palette data only, no DOM dependency |
-| `martes/tools/*` | a single generator, e.g. `martes/tools/tile/radius` |
+| `@legenki/martes` | `tools`, `core`, `helpers`, `voronoi`, `NICE_PALETTES`, `applyPaletteToTool` |
+| `@legenki/martes/core` | utilities — `toHex`, `setSeed`, `random`, `svgEl`, `lerp`, … |
+| `@legenki/martes/palettes` | palette data only, no DOM dependency |
+| `@legenki/martes/tools/*` | a single generator, e.g. `@legenki/martes/tools/tile/radius.js` |
 
 Rendering needs a `document`; importing does not. In Node, pair it with
 [`jsdom`](https://github.com/jsdom/jsdom) and assign `globalThis.document`.

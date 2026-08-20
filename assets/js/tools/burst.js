@@ -73,11 +73,11 @@ function renderBurst(svg, W, H, s) {
   const maxDist = Math.hypot(Math.max(ox, W - ox), Math.max(oy, H - oy));
 
   // Build uniform Voronoi — amount slider directly controls N
-  const cells = buildUniformVoronoi(W, H, s.amount, ox, oy, 1.4); window.DEBUG_CELLS = cells.length;
+  const cells = buildUniformVoronoi(W, H, s.amount, ox, oy, 1.4);
 
   // Deterministic per-cell color using index so adjacent cells differ
   cells.forEach((cell, idx) => {
-    if (cell.r < 1.5) { window.DEBUG_SKIPPED = (window.DEBUG_SKIPPED || 0) + 1; return; }
+    if (cell.r < 1.5) return;
 
     const dist = Math.hypot(cell.cx - ox, cell.cy - oy);
     const t = dist / maxDist; // 0=center → 1=edge

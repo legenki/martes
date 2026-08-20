@@ -2,7 +2,7 @@
 // All 15 original shapes in 40×40 tile space.
 // Each shape uses base/light/dark color roles.
 // Custom shapes also supported (single-color path).
-import { pick, clamp, svgEl, rgbToHex, uid } from '../core.js';
+import { pick, clamp, svgEl, rgbToHex, uid, toHex, hexToRgb } from '../core.js';
 
 export const MM_SHAPES = [
   { id:1,  label:'Cube',         markup: (b,l,d) => `<rect width="18" height="18" transform="matrix(0.866025 0.5 -0.866025 0.5 20 2)" fill="${b}"/><rect width="18" height="18" transform="matrix(0.866025 0.5 -2.20305e-08 1 4.41162 11)" fill="${l}"/><rect width="18" height="18" transform="matrix(0.866025 -0.5 2.20305e-08 1 20 20)" fill="${d}"/>` },
@@ -29,13 +29,10 @@ globalThis.mmCustomShapes = globalThis.mmCustomShapes || [];
 
 // Color brightening/darkening — works with any CSS color via canvas
 function mmAdjustColor(color, amount) {
-  // Parse via canvas to get rgb values regardless of input format
-  const cvs = document.createElement('canvas');
-  cvs.width = cvs.height = 1;
-  const ctx = cvs.getContext('2d');
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, 1, 1);
-  const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+  // Reuse core's normaliser rather than a private canvas: toHex handles
+  // hex/hsl/rgb without a 2D context, so this works headlessly too.
+  const hex = toHex(color, '#000000');
+  const [r, g, b] = hexToRgb(hex);
   return rgbToHex(
     clamp(r + amount, 0, 255),
     clamp(g + amount, 0, 255),
