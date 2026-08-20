@@ -1,3 +1,4 @@
+import { applyFx } from './fx.js';
 // ═══════════════════════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════════════════════
@@ -190,11 +191,20 @@ export function clearSVG() {
 export function renderTool() {
   if (!currentTool) return;
   clearSVG();
+  const state = getState();
   try {
-    currentTool.render(svg, canvasW, canvasH, getState());
+    currentTool.render(svg, canvasW, canvasH, state);
   } catch (e) {
     // Surface generator failures instead of leaving a blank canvas.
     console.error(`[martes] "${currentTool.slug}" failed to render:`, e);
+    return;
+  }
+  // Post-process. Kept out of the try above so a broken effect reports
+  // itself rather than looking like a generator failure.
+  try {
+    applyFx(svg, canvasW, canvasH, state);
+  } catch (e) {
+    console.error('[martes] FX failed:', e);
   }
 }
 

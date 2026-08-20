@@ -2,6 +2,7 @@ import { BB_SHAPES } from './tools/burst.js';
 import { MM_SHAPES } from './tools/tessera.js';
 import { setCurrentTool, rndInt, pick, map, RATIOS, canvasW, canvasH, currentTool, toolState, svg, resizeCanvas, renderTool, getState, toHex, setCanvasSize } from './core.js';
 import { pushUndo } from './history.js';
+import { FX, FX_BY_ID } from './fx.js';
 // Side-effect imports: these modules bind the action buttons and the
 // keyboard shortcuts on load. registry.js is the app's only entry point.
 import './actions.js';
@@ -206,10 +207,52 @@ export function buildPanel(tool) {
       </div>`;
   }
 
+  // FX — identical for all 34 generators: pick an effect, tune its params.
+  const activeFx = s._fx || 'none';
+  const fx = FX_BY_ID[activeFx] || FX_BY_ID.none;
+  html += `
+      <div class="p-section">
+        <div class="p-sec-head" data-sec="fx">FX <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="p-sec-body" id="sec-fx">
+          <div class="ctrl-row">
+            <div class="ctrl-label-row"><span class="ctrl-label">Effect</span></div>
+            <div class="btn-group">
+              ${FX.map(f => `<button class="btn-opt ${f.id === activeFx ? 'active' : ''}" data-fx="${f.id}">${f.name}</button>`).join('')}
+            </div>
+          </div>
+          ${fx.desc ? `<div class="fx-desc">${fx.desc}</div>` : ''}
+          ${fx.controls.map(c => buildCtrl({ ...c, id: '_fx_' + fx.id + '_' + c.id }, s, c.default)).join('')}
+        </div>
+      </div>`;
+
   const dyn = document.getElementById('dynamicSections');
   if (dyn) dyn.innerHTML = html;
   bindPanelEvents(tool, s);
+  bindFxEvents(tool, s);
   bindAccordion();
+}
+
+// ── FX section events ─────────────────────────────────────────
+// Effect params share the generic [data-ctrl] binding (their ids are just
+// prefixed), so only the effect picker itself needs its own handler.
+function bindFxEvents(tool, s) {
+  const scope = document.getElementById('sec-fx');
+  if (!scope) return;
+  scope.querySelectorAll('[data-fx]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      pushUndo();
+      s._fx = btn.dataset.fx;
+      // Seed the new effect's defaults so the canvas matches the panel
+      // the moment it is selected.
+      const fx = FX_BY_ID[s._fx];
+      if (fx) for (const c of fx.controls) {
+        const key = '_fx_' + fx.id + '_' + c.id;
+        if (s[key] === undefined) s[key] = c.default;
+      }
+      buildPanel(tool);
+      renderTool();
+    });
+  });
 }
 
 // ── mmmotif shape grid ────────────────────────────────────────
@@ -353,8 +396,10 @@ const SHAPE_PREVIEWS = {
   custom:   `<text x="50" y="58" text-anchor="middle" font-size="30" fill="currentColor" font-family="monospace">&lt;/&gt;</text>`,
 };
 
-function buildCtrl(c, s) {
-  const val = s[c.id];
+function buildCtrl(c, s, fallback) {
+  // FX params live under synthesised ids and are absent until first touched,
+  // so fall back to the control's own default rather than rendering undefined.
+  const val = s[c.id] !== undefined ? s[c.id] : (fallback !== undefined ? fallback : c.default);
   if (c.type === 'range') {
     return `<div class="ctrl-row">
       <div class="ctrl-label-row">

@@ -3,6 +3,7 @@ import { svg, currentTool, toolState, canvasW, canvasH,
 import { currentPaletteIndex, applyPaletteGlobal } from './palettes.js';
 import { TOOLS, selectTool, buildPanel } from './registry.js';
 import { pushUndo } from './history.js';
+import { FX } from './fx.js';
 import { BB_SHAPES } from './tools/burst.js';
 import { MM_SHAPES } from './tools/tessera.js';
 
@@ -79,6 +80,25 @@ export function doRandomize() {
     }
     // svgshape / custom shape pickers: leave unchanged (no sensible random)
   });
+
+  // FX: mostly leave the canvas clean, but occasionally pick an effect and
+  // randomise its params — an always-on effect would fight the generator.
+  if (Math.random() < 0.35) {
+    const pool = FX.filter(f => f.id !== 'none');
+    const fx = pool[Math.floor(Math.random() * pool.length)];
+    s._fx = fx.id;
+    for (const c of fx.controls) {
+      const key = '_fx_' + fx.id + '_' + c.id;
+      if (c.type === 'range') {
+        const dec = c.step < 1 ? Math.max(0, Math.ceil(-Math.log10(c.step))) : 0;
+        s[key] = parseFloat((Math.random() * (c.max - c.min) + c.min).toFixed(dec));
+      } else if (c.type === 'color') {
+        s[key] = toHex(`hsl(${rndInt(0,360)},${rndInt(55,95)}%,${rndInt(35,70)}%)`);
+      }
+    }
+  } else {
+    s._fx = 'none';
+  }
 
   // Tool-specific randomize hook (e.g. seed)
   if (typeof currentTool.randomize === 'function') {
