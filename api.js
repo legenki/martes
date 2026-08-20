@@ -9,6 +9,10 @@ export * as voronoi from './assets/js/tools/_voronoi.js';
 // drives the dropdown and pulls in registry.js -> actions.js, i.e. the whole
 // browser UI, which has no place in a headless entry point.
 export { NICE_PALETTES, applyPaletteToTool } from './assets/js/palettes.data.js';
+// FX are SVG filters, so they work headlessly exactly as they do in the app.
+// The WebGL shader layer is intentionally NOT exported: it needs a GPU
+// context and a canvas, neither of which exists in a headless render.
+export { FX, FX_BY_ID, applyFx, fxParams } from './assets/js/fx.js';
 
 import splat from './assets/js/tools/splat.js';
 import dust from './assets/js/tools/dust.js';

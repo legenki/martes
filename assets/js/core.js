@@ -177,9 +177,27 @@ export function fitCanvas() {
   const scale = Math.min(aW / canvasW, aH / canvasH, 1);
   svg.style.width  = Math.round(canvasW * scale) + 'px';
   svg.style.height = Math.round(canvasH * scale) + 'px';
+  // A WebGL shader overlay, if mounted, must follow the canvas box.
+  if (_shaderModule) _shaderModule.repositionShaderLayer();
 }
 
-if (hasDOM) window.addEventListener('resize', fitCanvas);
+// Set once shaders.js has been loaded, so core does not depend on it.
+let _shaderModule = null;
+export function _registerShaderModule(m) { _shaderModule = m; }
+
+if (hasDOM) {
+  window.addEventListener('resize', fitCanvas);
+  // fitCanvas measures the wrapper, which reads 0x0 while the pane is hidden
+  // (background tab, collapsed panel) — and the resize event alone never
+  // fires to undo it, leaving the canvas permanently collapsed. Re-fit
+  // whenever the wrapper actually gets a box, or the tab becomes visible.
+  if (canvasArea && typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(() => fitCanvas()).observe(canvasArea);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) fitCanvas();
+  });
+}
 
 // ═══════════════════════════════════════════════════════════════
 // CLEAR & RENDER
@@ -205,6 +223,13 @@ export function renderTool() {
     applyFx(svg, canvasW, canvasH, state);
   } catch (e) {
     console.error('[martes] FX failed:', e);
+  }
+  // WebGL overlay is async and browser-only; failures must never block
+  // the SVG that is already on screen.
+  if (hasDOM && state._shader && state._shader !== 'none') {
+    import('./shaders.js')
+      .then(m => { _registerShaderModule(m); return m.applyShader(svg, canvasW, canvasH, state); })
+      .catch(e => console.error('[martes] shader failed:', e));
   }
 }
 

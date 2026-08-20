@@ -175,9 +175,29 @@ export function doImportJSON() {
   input.click();
 }
 
-export function doSavePNG() {
+export async function doSavePNG() {
   if (!currentTool) return;
   const svgStr = getSVGString();
+  // With a WebGL shader active the SVG alone is not what the user sees,
+  // so composite artwork + shader instead of rasterising the SVG only.
+  const st = toolState[currentTool.slug] || {};
+  if (st._shader && st._shader !== 'none') {
+    try {
+      const { compositeToPNG, hasActiveShader } = await import('./shaders.js');
+      if (hasActiveShader()) {
+        const blob = await compositeToPNG(svgStr, canvasW, canvasH, 2);
+        const url = URL.createObjectURL(blob);
+        const a = Object.assign(document.createElement('a'), {
+          href: url, download: `${currentTool.slug}.png`
+        });
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        return;
+      }
+    } catch (e) {
+      toast('Shader composite failed — exporting artwork only.');
+    }
+  }
   const blob = new Blob([svgStr], {type:'image/svg+xml;charset=utf-8'});
   const url = URL.createObjectURL(blob);
   const img = new Image();

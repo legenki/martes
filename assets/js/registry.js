@@ -3,6 +3,7 @@ import { MM_SHAPES } from './tools/tessera.js';
 import { setCurrentTool, rndInt, pick, map, RATIOS, canvasW, canvasH, currentTool, toolState, svg, resizeCanvas, renderTool, getState, toHex, setCanvasSize } from './core.js';
 import { pushUndo } from './history.js';
 import { FX, FX_BY_ID } from './fx.js';
+import { SHADERS, SHADER_CONTROLS, SHADER_BY_ID, applyShader, teardownShader } from './shaders.js';
 // Side-effect imports: these modules bind the action buttons and the
 // keyboard shortcuts on load. registry.js is the app's only entry point.
 import './actions.js';
@@ -225,10 +226,31 @@ export function buildPanel(tool) {
         </div>
       </div>`;
 
+  // SHADER — real WebGL via @paper-design/shaders. Separate from FX because
+  // it renders to a canvas overlay and therefore cannot travel in the SVG.
+  const activeSh = s._shader || 'none';
+  html += `
+      <div class="p-section">
+        <div class="p-sec-head" data-sec="shader">SHADER <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="p-sec-body" id="sec-shader">
+          <div class="ctrl-row">
+            <div class="ctrl-label-row"><span class="ctrl-label">WebGL shader</span></div>
+            <div class="btn-group">
+              ${SHADERS.map(f => `<button class="btn-opt ${f.id === activeSh ? 'active' : ''}" data-shader="${f.id}">${f.name}</button>`).join('')}
+            </div>
+          </div>
+          ${activeSh !== 'none' ? `
+            <div class="fx-warn">Preview &amp; PNG only — WebGL cannot be embedded in exported SVG.</div>
+            ${SHADER_CONTROLS.map(c => buildCtrl({ ...c, id: '_sh_' + c.id }, s, c.default)).join('')}
+          ` : ''}
+        </div>
+      </div>`;
+
   const dyn = document.getElementById('dynamicSections');
   if (dyn) dyn.innerHTML = html;
   bindPanelEvents(tool, s);
   bindFxEvents(tool, s);
+  bindShaderEvents(tool, s);
   bindAccordion();
 }
 
@@ -247,6 +269,25 @@ function bindFxEvents(tool, s) {
       const fx = FX_BY_ID[s._fx];
       if (fx) for (const c of fx.controls) {
         const key = '_fx_' + fx.id + '_' + c.id;
+        if (s[key] === undefined) s[key] = c.default;
+      }
+      buildPanel(tool);
+      renderTool();
+    });
+  });
+}
+
+// ── SHADER section events ─────────────────────────────────────
+function bindShaderEvents(tool, s) {
+  const scope = document.getElementById('sec-shader');
+  if (!scope) return;
+  scope.querySelectorAll('[data-shader]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      pushUndo();
+      s._shader = btn.dataset.shader;
+      if (s._shader === 'none') teardownShader();
+      else for (const c of SHADER_CONTROLS) {
+        const key = '_sh_' + c.id;
         if (s[key] === undefined) s[key] = c.default;
       }
       buildPanel(tool);

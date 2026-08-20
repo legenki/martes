@@ -169,6 +169,27 @@ The server intentionally has no proxy, no remote fetches, no third-party endpoin
 
 ---
 
+## Effects
+
+Two independent effect layers sit under every generator's panel.
+
+**FX** — post-processing built from native SVG filter primitives: Grain,
+Warp, Halftone, Dither, Bloom, Chromatic, Posterize, Blur, Emboss, Duotone,
+Glitch, Vignette, Sharpen. These live *inside* the document, so they survive
+Copy, Save-SVG and PNG alike, and they work headlessly through the API.
+
+**Shader** — 24 real WebGL shaders from
+[@paper-design/shaders](https://github.com/paper-design/shaders), vendored
+under `assets/vendor/` and loaded lazily on first use.
+
+The two are separate because of one hard constraint: a WebGL shader renders
+to a `<canvas>`, and a canvas cannot be serialised into an SVG document.
+So a shader is **preview and PNG only** — Save-SVG and Copy export the
+artwork without it. The panel says so where you turn it on, and PNG export
+composites artwork and shader together rather than rasterising the SVG alone.
+Reach for FX when the result has to stay vector; reach for Shader when you
+want the GPU look and a raster export.
+
 ## Programmatic API
 
 ```bash
