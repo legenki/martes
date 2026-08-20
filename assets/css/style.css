@@ -360,10 +360,12 @@ html, body {
 .ctrl-val   { font-size: 0.72rem; color: var(--text-primary); font-weight: 600; min-width: 2.5rem; text-align: right; }
 
 .ctrl-num-input {
-  /* 3.5rem clipped values like "0.102" once the native spinner arrows claimed
-     their share of the box. The arrows are redundant next to the slider, so
-     they are hidden and the field gets room for the longest value. */
-  width: 4.25rem;
+  /* Wide enough for the longest value ("1555", "0.102") *next to* the native
+     stepper — the spinner is kept: it is a real control, and suppressing it
+     is engine-asymmetric (webkit pseudo-elements vs. appearance:textfield),
+     which previously left Firefox with no stepper at all.
+     `color-scheme` on :root is what makes it render dark. */
+  width: 5.25rem;
   background: var(--bg-canvas);
   border: 1px solid var(--border);
   color: var(--text-primary);
@@ -377,9 +379,7 @@ html, body {
 .ctrl-num-input:focus {
   border-color: var(--accent);
 }
-.ctrl-num-input::-webkit-outer-spin-button,
-.ctrl-num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.ctrl-num-input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+
 
 
 input[type="range"] {

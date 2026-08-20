@@ -4,7 +4,10 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 // jsdom's import.meta.url is not a file: URL, so resolve from the cwd
 // (vitest runs from the project root) instead.
-const css = readFileSync(resolve(process.cwd(), 'assets/css/style.css'), 'utf8');
+const raw = readFileSync(resolve(process.cwd(), 'assets/css/style.css'), 'utf8');
+// Strip comments — otherwise a rule that merely *explains* a declaration
+// reads as if it applied it.
+const css = raw.replace(/\/\*[\s\S]*?\*\//g, '');
 
 // Pull the declarations of a rule whose selector matches `re`.
 function ruleBody(re) {
@@ -29,22 +32,27 @@ describe('native control theming', () => {
 });
 
 describe('number input spinners', () => {
-  it('hides the webkit spinner buttons', () => {
-    expect(/::-webkit-(outer|inner)-spin-button/.test(css)).toBe(true);
-    const spin = ruleBody(/-webkit-(outer|inner)-spin-button/);
-    expect(/-webkit-appearance\s*:\s*none/.test(spin)).toBe(true);
-  });
-
-  it('sets appearance textfield on the number input itself', () => {
+  it('does not strip the native spinner in any engine', () => {
+    // Hiding the spinner is engine-asymmetric: `-webkit-appearance: none` on
+    // the ::-webkit-*-spin-button pseudo-elements only affects Chromium, while
+    // `appearance: textfield` on the input removes Firefox's spinner outright.
+    // Applying both left Chromium with a plain field and Firefox with no
+    // stepper at all — a control the user could no longer click.
     const num = ruleBody(/\.ctrl-num-input/);
-    expect(/appearance\s*:\s*textfield/.test(num)).toBe(true);
+    expect(/appearance\s*:\s*textfield/.test(num),
+      'appearance:textfield removes the spinner in Firefox').toBe(false);
+    expect(/::-webkit-(outer|inner)-spin-button/.test(css),
+      'the webkit spinner must not be suppressed either').toBe(false);
   });
 
-  it('keeps the value from overflowing the field', () => {
+  it('reserves room for the value next to the spinner', () => {
     const num = ruleBody(/^\.ctrl-num-input$/m);
     const w = /width\s*:\s*([\d.]+)rem/.exec(num);
     expect(w, '.ctrl-num-input needs an explicit width').toBeTruthy();
-    expect(parseFloat(w[1]), 'too narrow for values like "1555"').toBeGreaterThanOrEqual(4);
+    // The spinner occupies part of the box, so the field has to be wide
+    // enough for the longest value ("1555") *plus* the stepper.
+    expect(parseFloat(w[1]), 'too narrow for a 4-digit value plus the spinner')
+      .toBeGreaterThanOrEqual(4.75);
   });
 });
 
